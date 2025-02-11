@@ -1,36 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Portfolio</title>
-
-    <link rel="stylesheet" href="public/index.css">
+    <link rel="stylesheet" href="public/page.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    
-    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@v0.163.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@v0.163.0/examples/jsm/"
-        }
-      }
-    </script>
 </head>
 <body>
-    <div id="heading">
-        <h1>My Portfolio</h1> <box-icon name='move'></box-icon>
-        <div class="border"></div>
+    <header class="header">
+        <a href="#home" class="logo"> Thomas <span>Mbrice</span> </a>
+
+        <i class='bx bx-menu' id="menu-icon"></i>
+
+        <nav class="navbar">
+            <a href="#home" class="active">Home</a>
+            <a href="#education">Education</a>
+            <a href="#proj">Projects</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
+    </header>
+
+    <div id="popup" class="popup">
+        Hey! you missed the animation because the screen was too small. Use a bigger screen for the full experience.
     </div>
-    <div id="progress-container">
-        <div id="progress">Loading Animation</div>
-    </div>
+
+    <section class="welcome" id="welcome">
+        <h1>Welcome</h1>
+        <div class="arrow-container">
+            <div class="arrow"></div>
+        </div>
+    </section>
+
+    <section class="home" id="home">
+        <div class="home-content">
+            <h1>Hi, my name is <span>Thomas</span></h1> 
+            <h3 class="text-animation">I'm a <span></span></h3>
+            
+            <p>
+                One of the most difficult things I've done was learn how to code, countless late nights working on project,
+               social events missed studying and constant worry about getting a job. But at the same time coding is my favorite
+               thing to do, there is nothings like building somethings completely from scratch, or learning a new framework and even
+               practicing interview questions becomes an interesting problem solving experience. In that way Computer Science is the
+               ultimate form of dualism: something so frustrating is just one bug fix away from bliss. In that way tech isn't just
+               a career for me, <span>it's a way of life.</span>
+            </p>
+
+            <div class="social-icons">
+                <a href="https://www.linkedin.com/in/thomasmbrice/"><i class='bx bxl-linkedin' ></i></a>
+                <a href="https://github.com/ThomasMbrice"><i class='bx bxl-github' ></i></a>
+            </div>
+
+            <div class="btn-group">
+                <a href="#" id="downloadBtn" class="btn">Resume</a>
+                <a href="#contact" class="btn">Contact</a>
+            </div>
+        </div>
+
+            <div class="home-img">
+                <img src="public/pictures/finalsaveplease" alt="">
+            </div>
+
+    </section>
+
+    <section class="education" id="education">
+        <h2 class="heading"> Education </h2>
+
+         <div class="timeline-items">
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                    <div class="timeline-date">2022</div>
+                    <div class="timeline-content">
+                        <h3>Begin Undergrad in CS</h3>
+                        <p>Enrolled at Stony Brook University for a BS in Computer Science,
+                            got my first real experience in coding in other words,<br><span>print("Hello World")</span> 
+                        </p>
+                    </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                    <div class="timeline-date">2023</div>
+                    <div class="timeline-content">
+                        <h3>First Internship</h3>
+                        <p>Got an opportunity to learn outside the classroom in a professional
+                            setting with great mentors and a dynamic workspace, worked with IT to
+                            isolate hardware bugs for quicker repair/replace. Also got hands on experience
+                            on backend with CTO's supervision</p>
+                    </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                    <div class="timeline-date">2024</div>
+                    <div class="timeline-content">
+                        <h3>Hackathon</h3>
+                        <p>First hackathon, we built a responsive Next.js website which answers 
+                            therapy questions through ChatGPT API. We didn’t win, but I learned a 
+                            lot and made a lot more friends!</p>
+                    </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                    <div class="timeline-date">2024</div>
+                    <div class="timeline-content">
+                        <h3>This Summer</h3>
+                        <p>Spent anytime in between work and sleep building cool projects, both with friends and alone.
+                            Check them out on my Github, descriptions are below! 
+                        </p>
+                    </div>
+            </div>
+
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                    <div class="timeline-date">2026</div>
+                    <div class="timeline-content">
+                        <h3>Graduation</h3>
+                        <p>Will graduate in May of 2026 with a BS in Computer Science</p>
+                    </div>
+            </div>
+         </div>
+
+    </section>
+
+    <section class="proj" id="proj">
+        <h2 class="heading">Projects</h2>
+        <div class="proj-container">
+            <div class="proj-box">
+                <div class="proj-info">
+                    <h4>Code Up</h4>
+                    <p>I've always been someone who learns by doing, but early on in my CS story I didn't have a lot of
+                        resources to practice coding. That's the idea behind CodeUp, provide practice questions for students
+                        to reinforce ideas in intro level Computer Science Courses. 
+                    </p>
+                </div>
+            </div>
+            <div class="proj-box">
+                <div class="proj-info">
+                    <h4>PhReddit</h4>
+                    <p>I built a Reddit-style platform from the ground up that handles heavy traffic without breaking, 
+                        the backend runs on Express and MongoDB, processing over 1,000 users at once while keeping things snappy. 
+                        The React frontend makes it easy for users to post, join communities, and find what they're looking for. 
+                        I made sure to lock down security with JWT tokens, and wrapped everything in Docker to make testing and deployment smooth across all our servers. 
+                    </p>
+                </div>
+            </div>
+            <div class="proj-box">
+                <div class="proj-info">
+                    <h4>Investofolio</h4>
+                    <p>Investofolio came about from a conversation I had with a friends, we though there were no good tools for people
+                        who wanted to get into investing but didn't have the experience of time to buy a book or take a class. Therefore,
+                        Investofolio focused on educating users about stocks, featuring interactive graphs, real world examples and animations. 
+                    </p>
+                </div>
+            </div>
+            <div class="proj-box">
+                <div class="proj-info">
+                    <h4>Lilota</h4>
+                    <p>While working with IoT systems, I created an MQTT client integration for Lilota's embedded systems that enables real-time 
+                        device monitoring through Adafruit's services. I also helped improve an open-source TCL framework by adding networking features
+                         that make it easier for devices to communicate and share data.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <h2 class="heading">Contact <span>Me</span></h2>
     
-    <script type="module" src="js/main.js"></script>
+        <form action="">
+            <div class="input-group">
+                <div class="input-box">
+                    <input type="text"
+                    placeholder="Full Name">
+                    <input type="email" placeholder="Email">
+                </div>
+                <div class="input-box">
+                    <input type="number" placeholder="Phone Number">
+                    <input type="text" placeholder="Subject">
+                </div>
+            </div>
+
+            <div class="input-group-2">
+                <textarea name="" id="" cols="30" rows="10" placeholder="Your Message">
+                </textarea>
+                <input type="submit" value="Send Message" class="btn">
+            </div>
+        </form>
+    </section>
+
+    <footer class="footer">
+        <div class="social">
+            <a href="https://www.linkedin.com/in/thomasmbrice/"><i class='bx bxl-linkedin' ></i></a>
+            <a href="https://github.com/ThomasMbrice"><i class='bx bxl-github' ></i></a>
+        </div>
+        <ul class="lis">
+            <li>
+                <a href="#home">Home</a>
+            </li>
+            <li>
+                <a href="#education">My Journey</a>
+            </li>
+            <li>
+                <a href="#proj">Projects</a>
+            </li>
+            <li>
+                <a href="#contact">Contact</a>
+            </li>
+            <li>
+                <a href="index.html">Back To Animation</a>
+            </li>
+        </ul>
+        <p class="copyright">
+            Thomas Mbrice
+        </p>
+    </footer>
+
+    <script src="js/script.js"></script>
 </body>
-<div>
-    <h1 class="footer">Click the Spacebar to Start...</h1>
-</div>
 </html>
