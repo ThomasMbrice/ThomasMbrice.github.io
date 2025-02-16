@@ -395,7 +395,9 @@ home -img img{
 }
 .proj-box{
     background-color: var(--main-color);
-    height: 300px;
+    height: auto; /* Let the height adjust based on content */
+    min-height: 300px; /* Set a minimum height so they don't get too small */
+    max-height: 500px; /* Optionally set a max height for consistency */
     border-radius: 3rem;
     border: 5px solid transparent;
     cursor: pointer;
