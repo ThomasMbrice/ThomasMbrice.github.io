@@ -55,4 +55,22 @@ document.addEventListener('DOMContentLoaded', function() {
         link.click();
         document.body.removeChild(link);
     });
+    const imageContainer = document.getElementById('contactImage');
+    if (imageContainer) {
+        const img = new Image();
+        img.src = 'public/pictures/IMG_3074.JPG';  // Adjust path as needed
+        img.alt = 'Contact illustration';
+        img.style.cssText = 'max-width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); height: 75%;';
+        
+        // Add error handling
+        img.onerror = function() {
+            console.error('Error loading image');
+            // Optionally set a fallback image or display an error message
+        };
+        
+        img.onload = function() {
+            imageContainer.appendChild(img);
+        };
+    }
+
 });
