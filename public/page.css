@@ -10,14 +10,15 @@
 }
 
 :root{
-    --bg-color: #080808;
-    --second-bg-color: #131313;
-    --text-color: #D3EBEE;
-    --main-color: #00ffee;
+    --bg-color: #faf8f5;
+    --second-bg-color: #f5f1eb;
+    --text-color: #1f2937;
+    --main-color: #d97706;
+    --hover-color: #c2410c;
 }
 
 html{
-    font-size: 60%;
+    font-size: 74%;
     overflow-x: hidden;
 }
 
@@ -26,18 +27,20 @@ body{
     color: var(--text-color);
 }
 
+/* Header */
 .header{
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     padding: 4rem 12% 4rem;
-    background: rgba(0, 0, 0, 0.350);
+    background: rgba(250, 248, 245, 0.95);
     backdrop-filter: blur(10px);
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 5;
+    border-bottom: 1px solid rgba(31, 41, 55, 0.1);
 }
 
 .logo{
@@ -51,7 +54,9 @@ body{
 .logo:hover{
     transform: scale(1.1);
 }
+
 .logo span{
+    color: var(--main-color);
     text-shadow: 0 0 25px var(--main-color);
 }
 
@@ -60,7 +65,7 @@ body{
     color: var(--text-color);
     margin-left: 4rem;
     font-weight: 500;
-    transition: 0.3 ease;
+    transition: 0.3s ease;
     border-bottom: 3px solid transparent;
 }
 
@@ -69,17 +74,26 @@ body{
     color: var(--main-color);
     border-bottom: 3px solid var(--main-color);
 }
+
 #menu-icon{
     font-size: 3.6rem;
     color: var(--main-color);
     display: none;
 }
 
+/* Sections */
 section{
     min-height: 100vh;
     padding: 10rem 12% 10rem;
 }
 
+.heading{
+    font-size: 8rem;
+    text-align: center;
+    margin: 5rem 0;
+}
+
+/* Home Section */
 .home{
     display: flex;
     align-items: center;
@@ -96,20 +110,6 @@ section{
     margin-top: 3rem;
 }
 
-span{
-    color: var(--main-color);
-}
-
-.logo span{
-    color: var(--main-color);
-}
-
-.home-content h3{
-    margin-bottom: 2rem;
-    margin-top: 1rem;
-    font-size: 3.5rem;
-}
-
 .home-content h1{
     font-size: 7rem;
     font-weight: 700;
@@ -117,11 +117,24 @@ span{
     line-height: 1;
 }
 
+.home-content h3{
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+    font-size: 4rem;
+}
+
+.home-content p{
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.8;
+    max-width: 1000px;
+}
+
 .home-img{
     border-radius: 50%;
 }
 
-home -img img{
+.home-img img{
     position: relative; 
     top: 3rem;
     width: 32vw;
@@ -131,17 +144,76 @@ home -img img{
     transition: 0.4s ease-in-out;
 }
 
- .home-img img:hover{
+.home-img img:hover{
     box-shadow: 0 0 25px var(--main-color),
-    0 0 50px var(--main-color),
-    0 0 100px var(--main-color);
- }
+                0 0 50px var(--main-color),
+                0 0 100px var(--main-color);
+}
 
- .home-content p{
-    font-size: 1.5rem;
-    font-weight: 500;
-    line-height: 1.8;
-    max-width: 1000px;
+/* Text Animation */
+.text-animation{
+    font-size: 34px;
+    font-weight: 600;
+    min-width: 280px;
+}
+
+.text-animation span{
+    position: relative;
+}
+
+.text-animation span::before{
+    content: "";
+    color: var(--main-color);
+    animation: words 20s infinite;
+}
+
+.text-animation span::after{
+    content: "";
+    background-color: var(--bg-color);
+    position: absolute;
+    width: calc(100% + 8px);
+    height: 100%;
+    border-left: 3px solid var(--bg-color);
+    right: -8px;
+    animation: cursor 0.6s infinite, typing 20s steps(14) infinite;
+}
+
+@keyframes cursor{
+    to{
+        border-left: 2px solid var(--main-color);
+    }
+}
+
+@keyframes words{
+    0%, 20%{
+        content: "leading ML research";
+    }
+    21%, 40%{
+        content: "automating complex workflows";
+    }
+    41%, 60%{
+        content: "optimizing backend systems";
+    }
+    61%, 80%{
+        content: "containerizing applications";
+    }
+    81%, 100%{
+        content: "building production systems";
+    }
+}
+
+@keyframes typing{
+    10%, 15%, 30%, 35%, 50%, 55%, 70%, 75%, 90%, 95%{
+        width: 0;
+    }
+    5%, 20%, 25%, 40%, 45%, 60%, 65%, 80%, 85%{
+        width: calc(100% + 8px);
+    }
+}
+
+/* Buttons and Icons */
+span{
+    color: var(--main-color);
 }
 
 .social-icons a{
@@ -160,130 +232,53 @@ home -img img{
 }
 
 .social-icons a:hover{
-    color: var(--text-color);
-    transform: scale(1.3)translateY(-5px);
+    color: var(--bg-color);
+    transform: scale(1.3) translateY(-5px);
     box-shadow: 0 0 25px var(--main-color);
     background-color: var(--main-color);
 }
+
 .btn{
     display: inline-block;
     padding: 1rem 2.8rem;
     background: var(--main-color);
-    box-shadow: 0 0 25px var(--main-color);
+    box-shadow: 0 0 25px rgba(217, 119, 6, 0.3);
     border-radius: 4rem;
     font-size: 1.6rem;
-    color: black;
+    color: var(--bg-color);
     border: 2px solid transparent;
     letter-spacing: 0.1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.3 ease-in-out;
+    transition: 0.3s ease-in-out;
 }
+
 .btn:hover{
     transform: scale(1.05);
-    box-shadow: 0 0 50px var(--main-color);
+    box-shadow: 0 0 50px rgba(217, 119, 6, 0.4);
+    background: var(--hover-color);
 }
+
 .btn-group{
     display: flex;
     align-items: center;
     gap: 1.5rem;
 }
+
 .btn-group a:nth-of-type(2){
-    background-color: black;
+    background-color: transparent;
     color: var(--main-color);
     border: 2px solid var(--main-color);
     box-shadow: 0 0 25px transparent;
 }
 
 .btn-group a:nth-of-type(2):hover{
-    box-shadow: 0 0 25px var(--main-color);
+    box-shadow: 0 0 25px rgba(217, 119, 6, 0.3);
     background-color: var(--main-color);
-    color: black;
+    color: var(--bg-color);
 }
 
-.text-animation{
-    font-size: 34px;
-    font-weight: 600;
-    min-width: 280px
-}
-.text-animation span{
-    position: relative;
-}
-.text-animation span::before{
-    content: "";
-    color: var(--main-color);
-    animation: words 20s infinite;
-}
-.text-animation span::after{
-    content: "";
-    background-color: var(--bg-color);
-    position: absolute;
-    width: calc(100% + 8px);
-    height: 100%;
-    border-left: 3px solid var(--bg-color);
-    right: -8px;
-    animation: cursor 0.6s infinite, typing 20s steps(14) infinite;
-}
-@keyframes cursor{
-    to{
-        border-left: 2px solid var(--main-color);
-    }
-}
-@keyframes words{
-    0%,
-    20%{
-        content: "Software Engineer";
-    }
-    21%,
-    40%{
-        content: "Cybersecurity Enthusiast";
-    }
-    41%,
-    60%{
-        content: "CompSci Student";
-    }
-    61%,
-    80%{
-        content: "Creative Problem Solver";
-    }
-    81%,
-    100%{
-        content: "Student Leader";
-    }
-}
-
-@keyframes typing{
-    10%,
-    15%,
-    30%,
-    35%,
-    50%,
-    55%,
-    70%,
-    75%,
-    90%,
-    95%{
-        width: 0;
-    }
-    5%,
-    20%,
-    25%,
-    40%,
-    45%,
-    60%,
-    60%,
-    80%,
-    85%{
-        width: calc(100%+8px);
-    }
-}
-
-.heading{
-    font-size: 8rem;
-    text-align: center;
-    margin: 5rem 0;
-}
-
+/* Education/Timeline Section */
 .education{
     padding: 100px 15px;
     background: var(--second-bg-color);
@@ -300,6 +295,7 @@ home -img img{
     flex-wrap: wrap;
     position: relative;
 }
+
 .timeline-items::before{
     content: "";
     position: absolute;
@@ -308,32 +304,38 @@ home -img img{
     background-color: var(--main-color);
     left: calc(50%);
 }
+
 .timeline-item{
     margin-bottom: 40px;
     width: 100%;
     position: relative;
 }
+
 .timeline-item:last-child{
     margin-bottom: 0;
 }
+
 .timeline-item:nth-child(odd){
     padding-right: calc(51%);
     text-align: right;
 }
+
 .timeline-item:nth-child(even){ 
     padding-left: calc(51.5%);
 }
+
 .timeline-dot{
     height: 21px;
     width: 21px;
     background-color: var(--main-color);
     box-shadow: 0 0 25px var(--main-color),
-                0 0 50px var(--main-color);
+                0 0 50px rgba(217, 119, 6, 0.3);
     position: absolute;
     left: calc(49.32%);
     border-radius: 50%;
     top: 10px;
 }
+
 .timeline-date{
     font-size: 20px;
     font-weight: 800;
@@ -341,25 +343,29 @@ home -img img{
     margin: 6px 0 15px;
     padding: 20px;
 }
+
 .timeline-content{
     background-color: var(--bg-color);
     border: 3px solid var(--main-color);
     padding: 30px 50px;
     border-radius: 4rem;
-    box-shadow: 0 0 10px var(--main-color);
+    box-shadow: 0 0 10px rgba(217, 119, 6, 0.2);
     cursor: pointer;
     transition: 0.3s ease-in-out;
 }
+
 .timeline-content:hover{
     transform: scale(1.05);
-    box-shadow: 0 0 25px var(--main-color);
+    box-shadow: 0 0 25px rgba(217, 119, 6, 0.3);
 }
+
 .timeline-content h3{
     font-size: 20px;
     color: var(--text-color);
     margin: 0 0 10px;
     font-weight: 500;
 }
+
 .timeline-content p{
     color: var(--text-color);
     font-size: 16px;
@@ -367,48 +373,43 @@ home -img img{
     line-height: 22px;
 }
 
-::-webkit-scrollbar{
-    width: 15px;
-}
-
-::-webkit-scrollbar-thumb{
-    background-color: var(--main-color);    
-}
-::-webkit-scrollbar-track{
-    background-color: var(--bg-color);
-    width: 50px;
-}
-
+/* Projects Section */
 .proj{
     background: var(--bg-color);
-    color: black;
+    color: var(--text-color);
 }
+
 .proj h2{
     margin: 5rem;
     color: var(--text-color);
 }
+
 .proj-container{
     display: grid;
-    grid-template-columns: repeat(2,1fr);
+    grid-template-columns: repeat(2, 1fr);
     align-items: center;
     gap: 2.5rem;
 }
+
 .proj-box{
     background-color: var(--main-color);
-    height: auto; /* Let the height adjust based on content */
-    min-height: 300px; /* Set a minimum height so they don't get too small */
-    max-height: 500px; /* Optionally set a max height for consistency */
+    height: auto;
+    min-height: 300px;
+    max-height: 500px;
     border-radius: 3rem;
     border: 5px solid transparent;
     cursor: pointer;
     transition: 0.4s ease-in-out;
+    color: var(--bg-color);
 }
+
 .proj-box:hover{
-    background: var(--text-color);
-    color: black;
+    background: var(--second-bg-color);
+    color: var(--text-color);
     border: 5px solid var(--main-color);
     transform: scale(1.03);
 }
+
 .proj-box .proj-info{
     display: flex;
     flex-direction: column;
@@ -418,11 +419,13 @@ home -img img{
     align-items: baseline;
     padding: 5rem 5rem;
 }
+
 .proj-info h4{
     font-size: 3rem;
     font-weight: 800;
     line-height: 2;
 }
+
 .proj-info p{
     font-size: 1.6rem;
     font-weight: 600;
@@ -431,9 +434,11 @@ home -img img{
     margin: auto;
 }
 
+/* Contact Section */
 .contact{
     background-color: var(--second-bg-color);
 }
+
 .contact h2{
     margin-bottom: 3rem;
     color: var(--text-color);
@@ -462,25 +467,28 @@ home -img img{
     color: var(--text-color);
     background: var(--bg-color);
     border: 2px solid var(--main-color);
-    margin:  1.5rem 0;
+    margin: 1.5rem 0;
     resize: none;
+    border-radius: 1rem;
 }
 
 .contact form .btn{
     margin-top: 2rem;
 }
 
+/* Footer */
 .footer{
     position: relative;
     bottom: 0;
     width: 100%;
     padding: 40px 0;
     background-color: var(--bg-color);
+    border-top: 1px solid rgba(31, 41, 55, 0.1);
 }
+
 .footer .social{
     text-align: center;
     padding-bottom: 25px;
-    columns: var(--main-color);
 }
 
 .footer .social a{
@@ -498,10 +506,10 @@ home -img img{
 }
 
 .footer .social a:hover{
-    transform: scale(1.2)translateY(-10px);
+    transform: scale(1.2) translateY(-10px);
     background-color: var(--main-color);
-    color: black;
-    box-shadow: 0 0 25px var(--main-color);
+    color: var(--bg-color);
+    box-shadow: 0 0 25px rgba(217, 119, 6, 0.3);
 }
 
 .footer ul{
@@ -513,9 +521,14 @@ home -img img{
     text-align: center;
 }
 
+.footer ul li{
+    display: inline-block;
+    padding: 0 15px;
+}
+
 .footer ul li a{
     color: var(--text-color);
-    border-bottom:  3px solid transparent;
+    border-bottom: 3px solid transparent;
     transition: 0.3s ease-in-out;
 }
 
@@ -523,10 +536,6 @@ home -img img{
     border-bottom: 3px solid var(--main-color);
 }
 
-.footer ul li{
-    display: inline-block;
-    padding: 0 15px;
-}
 .footer .copyright{
     margin-top: 50px;
     text-align: center;
@@ -534,18 +543,61 @@ home -img img{
     color: var(--text-color);
 }
 
+/* Scrollbar */
+::-webkit-scrollbar{
+    width: 15px;
+}
+
+::-webkit-scrollbar-thumb{
+    background-color: var(--main-color);    
+}
+
+::-webkit-scrollbar-track{
+    background-color: var(--bg-color);
+    width: 50px;
+}
+
+/* Popup */
+.popup {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--main-color);
+    color: var(--bg-color);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    font-size: 14px;
+    text-align: center;
+}
+
+.popup.show {
+    display: block;
+}
+
+/* Font Face */
+@font-face {
+    font-family: 'Cyberpunt';
+    src: local('Cyberpunt'), url("saiba-45/SAIBA-45.ttf") format('truetype');
+}
+
+/* Media Queries */
 @media(max-width:1285px){
     html{
         font-size: 55%;
     }
     .proj-container{
         padding-bottom: 7rem;
-        grid-template-columns: repeat(2,1fr);
+        grid-template-columns: repeat(2, 1fr);
         margin: 0 5rem;
     }
 }
+
 @media(max-width:991px){
-    header{
+    .header{
         padding: 2rem 3%;
     }
     section{
@@ -563,7 +615,7 @@ home -img img{
         padding-left: 37px;
     }
     .timeline-items::before{
-    left: 0;
+        left: 0;
     }
     .timeline-dot{
         left: 0;
@@ -585,18 +637,16 @@ home -img img{
     }
     .navbar{
         position: absolute;
-    
-    top: 100%;
-    right: 0;
-    width: 50%;
-    padding: 1rem 3%;
-    background: 1rem 3%;
-    background: rgba(0, 0, 0, 0.867);
-    backdrop-filter: blur(20px);
-    border-bottom-left-radius: 2rem;
-    border-left: 2px solid var(--main-color);
-    border-bottom: 2px solid var(--main-color);
-    display: none;
+        top: 100%;
+        right: 0;
+        width: 50%;
+        padding: 1rem 3%;
+        background: rgba(250, 248, 245, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom-left-radius: 2rem;
+        border-left: 2px solid var(--main-color);
+        border-bottom: 2px solid var(--main-color);
+        display: none;
     }
     .navbar.active{
         display: block;
@@ -625,56 +675,10 @@ home -img img{
         margin-bottom: 3rem;
     }
     .proj-container{
-        grid-template-columns: repeat(1,1fr);
+        grid-template-columns: repeat(1, 1fr);
     }
 }
 
-.popup {
-    display: none; /* Initially hidden */
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--main-color);
-    color:var(--bg-color);
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    font-size: 14px;
-    text-align: center;
-}
-
-/* Optional: Style for popup visibility */
-.popup.show {
-    display: block;
-}
-
-/* Define the Cyberpunt font */
-@font-face {
-    font-family: 'Cyberpunt';
-    src: local('Cyberpunt'), url("saiba-45/SAIBA-45.ttf") format('truetype'); /* Correct format */
-}
-
-.welcome {
-    background-color: #D3EBEE; /* Background color */
-    display: flex; /* Use flexbox for centering */
-    flex-direction: column; /* Align items in a column */
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
-    text-align: center; /* Center text */
-    height: 100vh; /* Full viewport height */
-    padding: 0 20px; /* Add horizontal padding */
-    position: relative; /* For positioning the arrow */
-    font-family: 'Cyberpunt', sans-serif; /* Apply Cyberpunt font */
-}
-
-.welcome h1 {
-    font-family: 'Cyberpunt', sans-serif; /* Ensure the correct font is applied */
-    font-size: 8em; /* Larger font size */
-    color: #000; /* Text color */
-    margin: 0;
-}
 /* Arrow styling */
 .arrow-container {
     position: absolute; /* Absolute positioning for the arrow */
@@ -688,7 +692,7 @@ home -img img{
     height: 0;
     border-left: 20px solid transparent;
     border-right: 20px solid transparent;
-    border-top: 30px solid #000; /* Arrow color */
+    border-top: 30px solid var(--main-color); /* Arrow color */
     animation: bounce 1s infinite; /* Bounce animation */
 }
 
@@ -702,5 +706,274 @@ home -img img{
     }
     60% {
         transform: translateY(-5px);
+    }
+}
+/* onto venn diagrams*/
+/* Skills Venn Diagram Section - Add this to your page.css */
+
+.skills {
+    padding: 100px 15px;
+    background: var(--second-bg-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.skills h2 {
+    margin-bottom: 5rem;
+}
+
+.venn-container {
+    position: relative;
+    width: 1200px;
+    height: 900px;
+    margin: 0 auto;
+}
+
+.venn-circle {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--text-color);
+    background: transparent;
+    opacity: 0.7;
+}
+
+.venn-circle:hover {
+    background: var(--main-color);
+    border-color: var(--main-color);
+    opacity: 1;
+    transform: scale(1.05);
+    z-index: 10;
+    box-shadow: 0 0 30px rgba(217, 119, 6, 0.4);
+}
+
+.ml-circle {
+    top: 120px;
+    left: 200px;
+}
+
+.ai-circle {
+    top: 120px;
+    right: 200px;
+}
+
+.backend-circle {
+    bottom: -40px;
+    left: 30%;
+    transform: translateX(-50%);
+}
+
+.circle-label {
+    font-size: 2.8rem;
+    font-weight: 500;
+    color: var(--text-color);
+    z-index: 5;
+    position: relative;
+    transition: all 0.4s ease;
+    opacity: 0.9;
+}
+
+.venn-circle:hover .circle-label {
+    color: var(--bg-color);
+    font-weight: 600;
+    opacity: 0;
+}
+
+.info-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(31, 41, 55, 0.95);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.4s ease;
+    pointer-events: none;
+    padding: 2rem;
+    text-align: center;
+}
+
+.venn-circle:hover .info-cover {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.info-cover h3 {
+    color: var(--bg-color);
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+}
+
+.info-cover p {
+    color: #e5e7eb;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.skills-list {
+    list-style: none;
+    color: var(--bg-color);
+    font-size: 1rem;
+}
+
+.skills-list li {
+    background: rgba(217, 119, 6, 0.3);
+    margin: 0.3rem 0.2rem;
+    padding: 0.4rem 1rem;
+    border-radius: 15px;
+    display: inline-block;
+    border: 1px solid rgba(217, 119, 6, 0.5);
+}
+
+/* Venn Diagram Animations */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive Design for Skills Section */
+@media(max-width: 1285px) {
+    .venn-container {
+        width: 900px;
+        height: 700px;
+    }
+
+    .venn-circle {
+        width: 400px;
+        height: 400px;
+    }
+
+    .ml-circle {
+        top: 100px;
+        left: 150px;
+    }
+
+    .ai-circle {
+        top: 100px;
+        right: 150px;
+    }
+
+    .backend-circle {
+        bottom: 100px;
+    }
+
+    .circle-label {
+        font-size: 2.2rem;
+    }
+}
+
+@media(max-width: 991px) {
+    .venn-container {
+        width: 700px;
+        height: 550px;
+    }
+
+    .venn-circle {
+        width: 320px;
+        height: 320px;
+    }
+
+    .ml-circle {
+        top: 80px;
+        left: 120px;
+    }
+
+    .ai-circle {
+        top: 80px;
+        right: 120px;
+    }
+
+    .backend-circle {
+        bottom: 80px;
+    }
+
+    .circle-label {
+        font-size: 1.8rem;
+    }
+}
+
+@media(max-width: 768px) {
+    .venn-container {
+        width: 500px;
+        height: 450px;
+    }
+
+    .venn-circle {
+        width: 250px;
+        height: 250px;
+    }
+
+    .ml-circle {
+        top: 60px;
+        left: 80px;
+    }
+
+    .ai-circle {
+        top: 60px;
+        right: 80px;
+    }
+
+    .backend-circle {
+        bottom: 60px;
+    }
+
+    .circle-label {
+        font-size: 1.4rem;
+    }
+
+    .info-cover h3 {
+        font-size: 1.6rem;
+    }
+
+    .info-cover p {
+        font-size: 0.9rem;
+    }
+
+    .skills-list {
+        font-size: 0.8rem;
+    }
+
+    .skills-list li {
+        padding: 0.3rem 0.6rem;
     }
 }

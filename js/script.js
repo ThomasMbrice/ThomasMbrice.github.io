@@ -74,3 +74,61 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const circles = document.querySelectorAll('.venn-circle');
+            const intersections = document.querySelectorAll('.intersection');
+
+            // Animate circles on load
+            circles.forEach((circle, index) => {
+                circle.style.animation = `fadeInScale 0.8s ease ${index * 0.2}s both`;
+            });
+
+            // Animate intersections on load
+            intersections.forEach((intersection, index) => {
+                intersection.style.animation = `bounceIn 0.6s ease ${0.8 + index * 0.1}s both`;
+            });
+
+            // Add click effects
+            circles.forEach(circle => {
+                circle.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInScale {
+                from {
+                    opacity: 0;
+                    transform: scale(0.5);
+                }
+                to {
+                    opacity: 0.7;
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes bounceIn {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.3);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+                70% {
+                    transform: scale(0.9);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+        `;
+        document.head.appendChild(style);

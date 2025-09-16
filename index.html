@@ -15,13 +15,13 @@
 
         <nav class="navbar">
             <a href="#home" class="active">Home</a>
-            <a href="#education">Education</a>
+            <a href="#skills">Skills</a>
             <a href="#proj">Projects</a>
             <a href="#contact">Contact</a>
         </nav>
 
     </header>
-
+    <!--
     <div id="popup" class="popup">
         Hey! you missed the animation because the screen was too small. Use a bigger screen for the full experience.
     </div>
@@ -32,19 +32,17 @@
             <div class="arrow"></div>
         </div>
     </section>
+    -->
 
     <section class="home" id="home">
         <div class="home-content">
             <h1>Hi, my name is <span>Thomas</span></h1> 
-            <h3 class="text-animation">I'm a <span></span></h3>
+            <h3 class="text-animation">I'm currently <span></span></h3>
             
             <p>
-                One of the most difficult things I've done was learn how to code, countless late nights working on project,
-               social events missed studying and constant worry about getting a job. But at the same time coding is my favorite
-               thing to do, there is nothings like building somethings completely from scratch, or learning a new framework and even
-               practicing interview questions becomes an interesting problem solving experience. In that way Computer Science is the
-               ultimate form of dualism: something so frustrating is just one bug fix away from bliss. In that way tech isn't just
-               a career for me, <span>it's a way of life.</span>
+                I work at the intersection of AI research and scalable engineering. 
+                The most meaningful problems require both mathematical rigor and practical implementation. 
+                <span>I build systems that transform complex theory into tangible value.</span>
             </p>
 
             <div class="social-icons">
@@ -61,70 +59,90 @@
             <div class="home-img">
                 <img src="public/pictures/finalsaveplease" alt="">
             </div>
+        <div class="arrow-container">
+            <div class="arrow"></div>
+        </div>
 
     </section>
 
-    <section class="education" id="education">
-        <h2 class="heading"> Education </h2>
-
-         <div class="timeline-items">
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                    <div class="timeline-date">2022</div>
-                    <div class="timeline-content">
-                        <h3>Begin Undergrad in CS</h3>
-                        <p>Enrolled at Stony Brook University for a BS in Computer Science,
-                            got my first real experience in coding in other words,<br><span>print("Hello World")</span> 
-                        </p>
-                    </div>
+        <section class="skills" id="skills">
+        <h2 class="heading">My <span>Skills</span></h2>
+        
+        <div class="venn-container">
+            <!-- ML Circle -->
+            <div class="venn-circle ml-circle">
+                <div class="circle-label">ML</div>
+                <div class="info-cover">
+                    <h3>Machine Learning</h3>
+                    <p>Building intelligent systems that learn from data</p>
+                    <ul class="skills-list">
+                        <li>PyTorch</li>
+                        <li>Scikit-learn</li>
+                        <li>Neural Networks</li>
+                        <li>RAG</li>
+                        <li>LSTM</li>
+                        <li>Reinforcement Learning</li>
+                        <li>Algorithm </li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                    <div class="timeline-date">2023</div>
-                    <div class="timeline-content">
-                        <h3>First Internship</h3>
-                        <p>Got an opportunity to learn outside the classroom in a professional
-                            setting with great mentors and a dynamic workspace, worked with IT to
-                            isolate hardware bugs for quicker repair/replace. Also got hands on experience
-                            on backend with CTO's supervision</p>
-                    </div>
+            <!-- Cloud Circle -->
+            <div class="venn-circle ai-circle">
+                <div class="circle-label">Cloud</div>
+                <div class="info-cover">
+                    <h3>Cloud Engineering</h3>
+                    <p>Building systems that can be run on the cloud</p>
+                    <ul class="skills-list">
+                        <li>HPC</li>
+                        <li>Docker</li>
+                        <li>Containers</li>
+                        <li>AWS</li>
+                        <li>Azure</li>
+                        <li>Nvidia Clusters</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                    <div class="timeline-date">2024</div>
-                    <div class="timeline-content">
-                        <h3>Hackathon</h3>
-                        <p>First hackathon, we built a responsive Next.js website which answers 
-                            therapy questions through ChatGPT API. We didn’t win, but I learned a 
-                            lot and made a lot more friends!</p>
-                    </div>
+            <!-- Backend Circle -->
+            <div class="venn-circle backend-circle">
+                <div class="circle-label">Backend</div>
+                <div class="info-cover">
+                    <h3>Backend Development</h3>
+                    <p>Scalable server-side systems and infrastructure</p>
+                    <ul class="skills-list">
+                        <li>Node.js</li>
+                        <li>Express</li>
+                        <li>MongoDB</li>
+                        <li>Postgres SQL</li>
+                        <li>Data Pipelines</li>
+                        <li>CI/CD</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                    <div class="timeline-date">2024</div>
-                    <div class="timeline-content">
-                        <h3>This Summer</h3>
-                        <p>Spent anytime in between work and sleep building cool projects, both with friends and alone.
-                            Check them out on my Github, descriptions are below! 
-                        </p>
-                    </div>
+            <!-- Intersection Points -- instead of this do a drop down that
+            <div class="intersection ml-ai">
+                <span>MLOps</span>
+                <div class="tooltip">ML Engineering & AI Infrastructure</div>
             </div>
 
-
-            <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                    <div class="timeline-date">2026</div>
-                    <div class="timeline-content">
-                        <h3>Graduation</h3>
-                        <p>Will graduate in May of 2026 with a BS in Computer Science</p>
-                    </div>
+            <div class="intersection ml-backend">
+                <span>Data<br>Pipeline</span>
+                <div class="tooltip">Scalable ML Data Systems</div>
             </div>
-         </div>
 
+            <div class="intersection ai-backend">
+                <span>AI<br>APIs</span>
+                <div class="tooltip">Production AI Services</div>
+            </div>
+
+            <div class="intersection center-intersection">
+                <span>Full-Stack<br>AI</span>
+                <div class="tooltip">End-to-end AI Solutions</div>
+            </div>
+            -->
+        </div>
     </section>
 
     <section class="proj" id="proj">
@@ -169,58 +187,8 @@
     </section>
 
     <section class="contact" id="contact">
-        <style>
-            .contact {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 2rem;
-                padding: 2rem;
-            }
-            
-            .contact-content {
-                flex: 1;
-                min-width: 300px;
-            }
-            
-            .contact-image {
-                flex: 1;
-                min-width: 300px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            
-            .heading {
-                text-align: center;
-                margin-bottom: 2rem;
-                width: 100%;
-            }
-            
-            .input-group {
-                display: flex;
-                gap: 1rem;
-                margin-bottom: 1rem;
-            }
-            
-            .input-box {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            input, textarea {
-                padding: 0.8rem;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }
-            
-        
-        </style>
-    
         <h2 class="heading">Contact <span>Me</span></h2>
     
-        <div class="contact-image" id="contactImage"></div>
     
         <div class="contact-content">
             <form action="">
