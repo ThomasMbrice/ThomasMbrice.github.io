@@ -35,8 +35,9 @@
     -->
 
     <section class="home" id="home">
+    <div class="home-main">
         <div class="home-content">
-            <h1>Hi, my name is <span>Thomas</span></h1> 
+            <h1>Hi, my name is <span>Thomas</span></h1>
             <h3 class="text-animation">I'm currently <span></span></h3>
             
             <p>
@@ -56,21 +57,44 @@
             </div>
         </div>
 
-            <div class="home-img">
-                <img src="public/pictures/finalsaveplease" alt="">
-            </div>
-        <div class="arrow-container">
-            <div class="arrow"></div>
+        <div class="home-img">
+            <img src="public/pictures/finalsaveplease" alt="">
         </div>
+    </div>
 
-    </section>
+    <!-- NEW: LinkedIn Sidebar Panel -->
+    <div class="linkedin-sidebar">
+        <div class="sidebar-header">
+            <i class='bx bxl-linkedin'></i>
+            <h3>Recent Insights</h3>
+        </div>
+        
+        <div id="linkedin-loading" class="sidebar-loading">
+            <i class='bx bx-loader-alt bx-spin'></i> Loading...
+        </div>
+        
+        <div class="sidebar-posts" id="sidebar-posts">
+            <!-- LinkedIn posts will go here -->
+        </div>
+        
+        <div class="sidebar-footer">
+            <a href="https://www.linkedin.com/in/thomasmbrice/" target="_blank" class="sidebar-link">
+                View all posts <i class='bx bx-right-arrow-alt'></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="arrow-container">
+        <div class="arrow"></div>
+    </div>
+</section>
 
         <section class="skills" id="skills">
         <h2 class="heading">My <span>Skills</span></h2>
         
         <div class="venn-container">
             <!-- ML Circle -->
-            <div class="venn-circle ml-circle">
+            <div class="venn-circle ml-circle" data-category="ml">
                 <div class="circle-label">ML</div>
                 <div class="info-cover">
                     <h3>Machine Learning</h3>
@@ -88,7 +112,7 @@
             </div>
 
             <!-- Cloud Circle -->
-            <div class="venn-circle ai-circle">
+            <div class="venn-circle ai-circle" data-category="cl">
                 <div class="circle-label">Cloud</div>
                 <div class="info-cover">
                     <h3>Cloud Engineering</h3>
@@ -105,7 +129,7 @@
             </div>
 
             <!-- Backend Circle -->
-            <div class="venn-circle backend-circle">
+            <div class="venn-circle backend-circle" data-category="bk"> 
                 <div class="circle-label">Backend</div>
                 <div class="info-cover">
                     <h3>Backend Development</h3>
@@ -147,69 +171,56 @@
 
     <section class="proj" id="proj">
         <h2 class="heading">Projects</h2>
-        <div class="proj-container">
-            <div class="proj-box">
-                <div class="proj-info">
-                    <h4>Code Up</h4>
-                    <p>I've always been someone who learns by doing, but early on in my CS story I didn't have a lot of
-                        resources to practice coding. That's the idea behind CodeUp, provide practice questions for students
-                        to reinforce ideas in intro level Computer Science Courses. 
-                    </p>
-                </div>
+
+        <!-- Filter Status and Reset -->
+        <div class="filter-controls" style="text-align: center; margin-bottom: 2rem;">
+            <div id="filter-status" style="font-size: 1.6rem; color: var(--main-color); margin-bottom: 1rem;">
+                Showing: All Projects
             </div>
-            <div class="proj-box">
-                <div class="proj-info">
-                    <h4>PhReddit</h4>
-                    <p>I built a Reddit-style platform with a React frontend makes it easy for users to post, join communities, 
-                        and find what they're looking for, and a backend that runs on Express and MongoDB.
-                        The project is locked down with JWT tokens, and wrapped everything in Docker to make testing and deployment smooth across several servers. 
-                    </p>
-                </div>
-            </div>
-            <div class="proj-box">
-                <div class="proj-info">
-                    <h4>Investofolio</h4>
-                    <p>Investofolio came about from a conversation I had with a friends, we though there were no good tools for people
-                        who wanted to get into investing but didn't have the experience of time to buy a book or take a class. Therefore,
-                        Investofolio focused on educating users about stocks, featuring interactive graphs, real world examples and animations. 
-                    </p>
-                </div>
-            </div>
-            <div class="proj-box">
-                <div class="proj-info">
-                    <h4>Lilota</h4>
-                    <p>While working with IoT systems, I created an MQTT client integration for Lilota's embedded systems that enables real-time 
-                        device monitoring through Adafruit's services. I also helped improve an open-source TCL framework by adding networking features
-                         that make it easier for devices to communicate and share data.</p>
-                </div>
-            </div>
+            <button id="reset-filter" class="btn" style="display: none;">
+                <i class='bx bx-refresh'></i> Show All Projects
+            </button>
+        </div>
+    
+        <!-- Loading state -->
+        <div id="loading" class="loading" style="text-align: center; font-size: 1.8rem; color: var(--main-color);">
+            <i class='bx bx-loader-alt bx-spin'></i> Loading projects from GitHub...
+        </div>
+    
+        <!-- Projects container - this will be filled with GitHub projects -->
+        <div class="proj-container" id="github-projects">
+            <!-- loaded dynamiccaly -->
+        </div>
+    
+        <!-- Error state -->
+        <div id="error" class="error" style="display: none; text-align: center; color: #dc2626;">
+            Failed to load projects from GitHub.
         </div>
     </section>
 
     <section class="contact" id="contact">
-        <h2 class="heading">Contact <span>Me</span></h2>
-    
-    
-        <div class="contact-content">
-            <form action="">
-                <div class="input-group">
-                    <div class="input-box">
-                        <input type="text" placeholder="Full Name">
-                        <input type="email" placeholder="Email">
-                    </div>
-                    <div class="input-box">
-                        <input type="number" placeholder="Phone Number">
-                        <input type="text" placeholder="Subject">
-                    </div>
+    <h2 class="heading">Contact <span>Me</span></h2>
+
+    <div class="contact-content">
+        <form action="https://formspree.io/f/xyzdrzdj" method="POST">
+            <div class="input-group">
+                <div class="input-box">
+                    <input type="text" name="name" placeholder="Full Name" required>
+                    <input type="email" name="email" placeholder="Email" required>
                 </div>
-    
-                <div class="input-group-2">
-                    <textarea name="" id="" cols="30" rows="10" placeholder="Your Message"></textarea>
-                    <input type="submit" value="Send Message" class="btn">
+                <div class="input-box">
+                    <!-- <input type="tel" name="phone" placeholder="Phone Number"> -->
+                    <input type="text" name="subject" placeholder="Subject" required>
                 </div>
-            </form>
-        </div>
-    </section>
+            </div>
+
+            <div class="input-group-2">
+                <textarea name="message" cols="30" rows="10" placeholder="Your Message" required></textarea>
+                <input type="submit" value="Send Message" class="btn">
+            </div>
+        </form>
+    </div>
+</section>
 
     <footer class="footer">
         <div class="social">
@@ -221,16 +232,13 @@
                 <a href="#home">Home</a>
             </li>
             <li>
-                <a href="#education">My Journey</a>
+                <a href="#skills">Skills</a>
             </li>
             <li>
                 <a href="#proj">Projects</a>
             </li>
             <li>
                 <a href="#contact">Contact</a>
-            </li>
-            <li>
-                <a href="index.html">Back To Animation</a>
             </li>
         </ul>
         <p class="copyright">

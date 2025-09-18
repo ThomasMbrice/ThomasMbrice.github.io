@@ -3,21 +3,271 @@ let navbar = document.querySelector('.navbar');
 let sections = document.querySelectorAll('section');
 let navlinks = document.querySelectorAll('header nav a');
 
+class GitHubProjects {
+    constructor() {
+        this.username = 'ThomasMbrice';
+        this.allProjects = [];
+        this.init();
+    }
+    
+    async init() {
+        await this.fetchProjects();
+        this.displayProjectsByCategory();
+        this.setupFiltering();
+    }
+    
+    async fetchProjects() {
+        try {
+            const response = await fetch(`https://api.github.com/users/${this.username}/repos?sort=updated&per_page=20`);
+            const repos = await response.json();
+            
+            this.allProjects = repos.filter(repo => !repo.fork);
+            console.log('Loaded projects:', this.allProjects.length);
+            
+        } catch (error) {
+            console.error('Error:', error);
+            this.showError();
+        }
+    }
+    
+    categorizeProjects() {
+        const categories = {
+            ml: [],
+            cloud: [],
+            backend: [],
+            other: []
+        };
+            this.allProjects.forEach(project => {
+        const description = project.description || '';
+        
+        // Check last 2 characters of description
+        const lastTwo = description.slice(-2).toLowerCase();
+        
+        if (lastTwo === 'ml') {
+            categories.ml.push(project);
+        } else if (lastTwo === 'cl') {
+            categories.cloud.push(project);
+        } else if (lastTwo === 'bk') {
+            categories.backend.push(project);
+        } else {
+            categories.other.push(project);
+        }
+    });
+    
+    return categories;
+}
+
+    displayProjectsByCategory() {
+    const container = document.getElementById('github-projects');
+    const loading = document.getElementById('loading');
+    
+    loading.style.display = 'none';
+    
+    const categories = this.categorizeProjects();
+    
+    let html = '';
+    
+    // Use the same category IDs as the tags
+    if (categories.ml.length > 0) {
+        html += this.createCategorySection('Machine Learning', categories.ml, 'ml');
+    }
+    
+    if (categories.cloud.length > 0) {
+        html += this.createCategorySection('Cloud Engineering', categories.cloud, 'cl');
+    }
+    
+    if (categories.backend.length > 0) {
+        html += this.createCategorySection('Backend Development', categories.backend, 'bk');
+    }
+    
+    if (categories.other.length > 0) {
+        html += this.createCategorySection('Other Projects', categories.other, 'other');
+    }
+    
+    container.innerHTML = html;
+}
+
+    createCategorySection(title, projects, categoryId) {
+        return `
+            <div class="category-section" data-category="${categoryId}">
+                <div class="category-header">
+                    <h3>${title} (${projects.length})</h3>
+                </div>
+                <div class="category-projects">
+                    ${projects.map(project => this.createProjectCard(project)).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    createProjectCard(project) {
+    // Remove last 2 letters from description if they're category tags
+    let description = project.description || 'No description available - update this on GitHub!';
+    const lastTwo = description.slice(-2).toLowerCase();
+    
+    if (['ml', 'cl', 'bk'].includes(lastTwo)) {
+        description = description.slice(0, -2).trim();
+    }
+    
+    return `
+        <div class="proj-box">
+            <div class="proj-info">
+                <div class="proj-content">
+                    <h4>${project.name.replace(/[_-]/g, ' ')}</h4>
+                    <p>${description}</p>
+                </div>
+                <div class="proj-links">
+                    <a href="${project.html_url}" target="_blank" class="btn btn-inverted">
+                        <i class='bx bxl-github'></i> View Code
+                    </a>
+                    ${project.homepage ? `
+                        <a href="${project.homepage}" target="_blank" class="btn btn-inverted">
+                            <i class='bx bx-link-external'></i> Live Demo
+                        </a>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+    setupFiltering() {
+    // Add click listeners to Venn circles
+    document.querySelectorAll('.venn-circle').forEach(circle => {
+        circle.addEventListener('click', () => {
+            const category = circle.dataset.category;
+            this.filterByCategory(category);
+            
+            // Update active state
+            this.updateActiveCircle(circle);
+            
+            // Scroll to projects section
+            document.getElementById('proj').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+    
+    // Add reset button functionality
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'reset-filter') {
+            this.resetFilter();
+        }
+    });
+}
+
+filterByCategory(category) {
+    const sections = document.querySelectorAll('.category-section');
+    const resetBtn = document.getElementById('reset-filter');
+    
+    console.log('=== BEFORE FILTERING ===');
+    sections.forEach((section, index) => {
+        console.log(`Section ${index}: category="${section.dataset.category}", display="${section.style.display}"`);
+    });
+    
+    sections.forEach((section, index) => {
+        const sectionCategory = section.dataset.category;
+        
+        if (sectionCategory === category) {
+            section.style.display = 'block';
+            // Removed: section.style.backgroundColor = 'lightgreen';
+            console.log(`✓ SHOWING section: ${sectionCategory}`);
+        } else {
+            section.style.display = 'none';
+            // Removed: section.style.backgroundColor = 'lightcoral';
+            console.log(`✗ HIDING section: ${sectionCategory}`);
+        }
+    });
+    
+    console.log('=== AFTER FILTERING ===');
+    sections.forEach((section, index) => {
+        console.log(`Section ${index}: category="${section.dataset.category}", display="${section.style.display}"`);
+    });
+    
+    // Show reset button
+    if (resetBtn) {
+        resetBtn.style.display = 'block';
+    }
+    
+    this.updateFilterText(category);
+}
+
+resetFilter() {
+    const sections = document.querySelectorAll('.category-section');
+    const resetBtn = document.getElementById('reset-filter');
+    
+    // Show all sections
+    sections.forEach(section => {
+        section.style.display = 'block';
+    });
+    
+    // Hide reset button
+    if (resetBtn) {
+        resetBtn.style.display = 'none';
+    }
+    
+    // Clear active circles
+    document.querySelectorAll('.venn-circle').forEach(circle => {
+        circle.classList.remove('active');
+    });
+    
+    // Update filter text
+    this.updateFilterText('all');
+    
+    console.log('Showing all projects');
+}
+
+updateActiveCircle(activeCircle) {
+    // Remove active from all circles
+    document.querySelectorAll('.venn-circle').forEach(circle => {
+        circle.classList.remove('active');
+    });
+    
+    // Add active to clicked circle
+    activeCircle.classList.add('active');
+}
+
+updateFilterText(category) {
+    const filterText = document.getElementById('filter-status');
+    if (filterText) {
+        const categoryNames = {
+            all: 'All Projects',
+            ml: 'Machine Learning Projects',
+            cloud: 'Cloud Engineering Projects', 
+            backend: 'Backend Development Projects'
+        };
+        filterText.textContent = `Showing: ${categoryNames[category] || 'All Projects'}`;
+    }
+}
+    
+    showError() {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {    
+    new GitHubProjects();
+});
+
+
 window.onscroll = () => {
     sections.forEach(sec => {
         let top = window.scrollY;
-        let offset = sec.offsetTop -150;
+        let offset = sec.offsetTop - 150;
         let height = sec.offsetHeight;
         let id = sec.getAttribute('id');
 
         if(top >= offset && top < offset + height){
-            navlinks.forEach(links =>{
+            navlinks.forEach(links => {
                 links.classList.remove('active');
-                document.querySelectorAll('header nav a [href*=' + id +" ]")
-                .classList.add('active')
-            })
+            });
+            
+            // Fix: Use querySelector instead of querySelectorAll, and fix the selector
+            const activeLink = document.querySelector('header nav a[href*=' + id + ']');
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
         }
-    })
+    });
 }
 
 menuIcon.onclick = () => {
@@ -72,7 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
             imageContainer.appendChild(img);
         };
     }
-
 });
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -132,3 +381,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         `;
         document.head.appendChild(style);
+

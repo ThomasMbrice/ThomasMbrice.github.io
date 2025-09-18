@@ -18,7 +18,7 @@
 }
 
 html{
-    font-size: 65%;
+    font-size: 55%;
     overflow-x: hidden;
 }
 
@@ -28,7 +28,7 @@ body{
 }
 
 /* Header */
-.header{
+.header {
     position: fixed;
     top: 0;
     left: 0;
@@ -39,7 +39,7 @@ body{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 5;
+    z-index: 1000; /* Changed from z-index: 5 to 1000 */
     border-bottom: 1px solid rgba(31, 41, 55, 0.1);
 }
 
@@ -94,20 +94,158 @@ section{
 }
 
 /* Home Section */
-.home{
+/* Updated Home Layout with Sidebar */
+/* Add this to your page.css - specific spacing for home section */
+.home {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3rem;
+    padding: 25rem 5% 10rem; /* Increased from 10rem to 15rem top padding */
+}
+
+.home-main {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 15rem;
+    flex: 1;
+    max-width: 1200px;
 }
 
-.home-content{
+/* LinkedIn Sidebar Panel */
+.linkedin-sidebar {
+    width: 350px;
+    max-height: 80vh;
+    background: var(--second-bg-color);
+    border: 2px solid var(--main-color);
+    border-radius: 2rem;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    align-items: baseline;
-    text-align: left;
-    justify-content: center;
-    margin-top: 3rem;
+    box-shadow: 0 10px 30px rgba(217, 119, 6, 0.1);
+    top: 12rem;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 2rem 1rem 2rem;
+    border-bottom: 2px solid rgba(217, 119, 6, 0.2);
+}
+
+.sidebar-header i {
+    font-size: 2.4rem;
+    color: var(--main-color);
+}
+
+.sidebar-header h3 {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.sidebar-loading {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--main-color);
+    font-size: 1.4rem;
+}
+
+.sidebar-posts {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    max-height: 50vh;
+}
+
+.sidebar-post {
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background: var(--bg-color);
+    border-radius: 1rem;
+    border-left: 3px solid var(--main-color);
+    transition: 0.3s ease;
+}
+
+.sidebar-post:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(217, 119, 6, 0.1);
+}
+
+.post-content {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.post-meta {
+    font-size: 1.1rem;
+    color: var(--main-color);
+    font-weight: 500;
+}
+
+.sidebar-footer {
+    padding: 1.5rem 2rem;
+    border-top: 2px solid rgba(217, 119, 6, 0.2);
+    text-align: center;
+}
+
+.sidebar-link {
+    color: var(--main-color);
+    font-size: 1.4rem;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.sidebar-link:hover {
+    color: var(--hover-color);
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar-posts::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-posts::-webkit-scrollbar-track {
+    background: rgba(245, 241, 235, 0.3);
+    border-radius: 10px;
+}
+
+.sidebar-posts::-webkit-scrollbar-thumb {
+    background: var(--main-color);
+    border-radius: 10px;
+}
+
+/* Responsive Design */
+@media(max-width: 1200px) {
+    .linkedin-sidebar {
+        width: 300px;
+    }
+    
+    .home-main {
+        gap: 8rem;
+    }
+}
+
+@media(max-width: 991px) {
+    .home {
+        flex-direction: column;
+        gap: 4rem;
+    }
+    
+    .linkedin-sidebar {
+        width: 100%;
+        max-width: 600px;
+        position: static;
+        max-height: 400px;
+    }
+    
+    .home-main {
+        flex-direction: column-reverse;
+    }
 }
 
 .home-content h1{
@@ -384,30 +522,61 @@ span{
     color: var(--text-color);
 }
 
-.proj-container{
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-items: center;
-    gap: 2.5rem;
+.proj-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-height: 70vh; /* Set maximum height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 2rem;
+    border: 2px solid var(--main-color);
+    border-radius: 2rem;
+    background: rgba(245, 241, 235, 0.5);
+    margin: 0 auto;
+    max-width: 1200px;
 }
 
-.proj-box{
+.proj-box {
     background-color: var(--main-color);
     height: auto;
-    min-height: 300px;
-    max-height: 500px;
-    border-radius: 3rem;
-    border: 5px solid transparent;
+    min-height: 120px; /* Reduced height for horizontal layout */
+    width: 100%; /* Full width */
+    border-radius: 2rem;
+    border: 3px solid transparent;
     cursor: pointer;
     transition: 0.4s ease-in-out;
     color: var(--bg-color);
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
-.proj-box:hover{
+.proj-box:hover {
     background: var(--second-bg-color);
     color: var(--text-color);
-    border: 5px solid var(--main-color);
-    transform: scale(1.03);
+    border: 3px solid var(--main-color);
+    transform: scale(1.02); /* Slightly less scale for horizontal cards */
+}
+
+.category-section {
+    margin-bottom: 3rem;
+}
+
+.category-header {
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+}
+
+.category-header h3 {
+    font-size: 2.4rem;
+    color: var(--main-color);
+    border-bottom: 2px solid var(--main-color);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.category-projects {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .proj-box .proj-info{
@@ -726,15 +895,73 @@ span{
 
 .venn-container {
     position: relative;
-    width: 1200px;
-    height: 900px;
+    width: 100%;
+    max-width: 800px;
+    height: 60vh;
+    min-height: 500px;
     margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+.venn-circle::before {
+    content: 'Click to filter projects';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-color);
+    color: var(--bg-color);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 20;
+}
+
+.venn-circle:hover::before {
+    opacity: 1;
+}
+
+/* Active state for clicked circles */
+.venn-circle.active {
+    background: var(--main-color) !important;
+    border-color: var(--main-color) !important;
+    opacity: 1 !important;
+    transform: scale(1.05) !important;
+    z-index: 10 !important;
+    box-shadow: 0 0 30px rgba(217, 119, 6, 0.4) !important;
+}
+
+.venn-circle.active .circle-label {
+    color: var(--bg-color) !important;
+    font-weight: 600 !important;
+}
+
+/* Reset button styling */
+#reset-filter {
+    background: var(--hover-color);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
 
 .venn-circle {
     position: absolute;
-    width: 500px;
-    height: 500px;
+    width: 40vw;
+    max-width: 350px;
+    min-width: 250px;
+    height: 40vw;
+    max-height: 350px;
+    min-height: 250px;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.4s ease;
@@ -756,20 +983,23 @@ span{
 }
 
 .ml-circle {
-    top: 120px;
-    left: 200px;
+    top: 0;
+    left: 12%;
+    transform: translateX(-50%);
 }
 
 .ai-circle {
-    top: 120px;
-    right: 200px;
+    top: 0%;
+    right: 12%;
+    transform: translateX(25%);
 }
 
 .backend-circle {
-    bottom: -40px;
-    left: 30%;
-    transform: translateX(-50%);
+    top: 45%;
+    left: 28%;
+    transform: translateX(-25%);
 }
+
 
 .circle-label {
     font-size: 2.8rem;
@@ -870,109 +1100,68 @@ span{
     }
 }
 
-/* Responsive Design for Skills Section */
-@media(max-width: 1285px) {
-    .venn-container {
-        width: 900px;
-        height: 700px;
-    }
-
-    .venn-circle {
-        width: 400px;
-        height: 400px;
-    }
-
-    .ml-circle {
-        top: 100px;
-        left: 150px;
-    }
-
-    .ai-circle {
-        top: 100px;
-        right: 150px;
-    }
-
-    .backend-circle {
-        bottom: 100px;
-    }
-
-    .circle-label {
-        font-size: 2.2rem;
-    }
-}
-
-@media(max-width: 991px) {
-    .venn-container {
-        width: 700px;
-        height: 550px;
-    }
-
-    .venn-circle {
-        width: 320px;
-        height: 320px;
-    }
-
-    .ml-circle {
-        top: 80px;
-        left: 120px;
-    }
-
-    .ai-circle {
-        top: 80px;
-        right: 120px;
-    }
-
-    .backend-circle {
-        bottom: 80px;
-    }
-
-    .circle-label {
-        font-size: 1.8rem;
-    }
-}
-
 @media(max-width: 768px) {
     .venn-container {
-        width: 500px;
-        height: 450px;
+        height: 50vh;
+        min-height: 400px;
     }
-
+    
     .venn-circle {
-        width: 250px;
-        height: 250px;
+        width: 45vw;
+        height: 45vw;
+        max-width: 280px;
+        max-height: 280px;
+        min-width: 200px;
+        min-height: 200px;
     }
-
-    .ml-circle {
-        top: 60px;
-        left: 80px;
-    }
-
+    
     .ai-circle {
-        top: 60px;
-        right: 80px;
+        transform: translateX(20%);
     }
-
+    
     .backend-circle {
-        bottom: 60px;
+        transform: translateX(-20%);
     }
+}
 
-    .circle-label {
-        font-size: 1.4rem;
+@media(max-width: 480px) {
+    .venn-circle {
+        width: 50vw;
+        height: 50vw;
+        max-width: 220px;
+        max-height: 220px;
     }
+    
+    .ai-circle {
+        transform: translateX(0%);
+    }
+    
+    .backend-circle {
+        transform: translateX(-15%);
+    }
+}
 
-    .info-cover h3 {
-        font-size: 1.6rem;
-    }
+/* Inverted button for project links */
+.btn-inverted {
+    background: var(--bg-color);
+    color: var(--main-color);
+    border: 2px solid var(--main-color);
+    font-size: 1.4rem;
+    padding: 0.8rem 1.5rem;
+    margin: 0 0.5rem;
+}
 
-    .info-cover p {
-        font-size: 0.9rem;
-    }
+.btn-inverted:hover {
+    background: var(--main-color);
+    color: var(--bg-color);
+    transform: scale(1.05);
+}
 
-    .skills-list {
-        font-size: 0.8rem;
-    }
-
-    .skills-list li {
-        padding: 0.3rem 0.6rem;
-    }
+/* Update proj-links for better spacing */
+.proj-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: wrap;
 }
