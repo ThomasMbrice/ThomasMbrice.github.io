@@ -246,6 +246,7 @@ updateFilterText(category) {
 
 document.addEventListener('DOMContentLoaded', function() {    
     new GitHubProjects();
+    new LinkedInPosts(); 
 });
 
 
@@ -295,6 +296,9 @@ window.addEventListener('load', checkScreenSize);
 window.addEventListener('resize', checkScreenSize);
 
 document.addEventListener('DOMContentLoaded', function() {
+    new GitHubProjects();
+    new GitHubActivity(); 
+
     document.getElementById('downloadBtn').addEventListener('click', function(event) {
         event.preventDefault(); // Prevent the default anchor click behavior
 
@@ -382,3 +386,199 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.head.appendChild(style);
 
+// GitHub Activity Feed Manager
+class GitHubActivity {
+    constructor() {
+        this.username = 'ThomasMbrice';
+        this.activities = [];
+        this.init();
+    }
+    
+    async init() {
+        await this.fetchActivity();
+        this.displayActivity();
+    }
+    
+    async fetchActivity() {
+        const loading = document.getElementById('linkedin-loading');
+        if (loading) loading.style.display = 'block';
+        
+        try {
+            console.log('🔍 Fetching GitHub activity...');
+            
+            // GitHub Events API - public, no auth needed!
+            const response = await fetch(`https://api.github.com/users/${this.username}/events?per_page=20`);
+            
+            if (!response.ok) {
+                throw new Error(`GitHub API error: ${response.status}`);
+            }
+            
+            const events = await response.json();
+            console.log('✅ GitHub events received:', events.length);
+            
+            // Transform GitHub events to activities
+            this.activities = this.parseGitHubEvents(events);
+            console.log('✅ Activities processed:', this.activities.length);
+            
+        } catch (error) {
+            console.error('❌ Failed to fetch GitHub activity:', error);
+            this.activities = [];
+        }
+        
+        if (loading) loading.style.display = 'none';
+    }
+    
+    parseGitHubEvents(events) {
+        const activities = [];
+        
+        events.forEach(event => {
+            let activity = null;
+            
+            switch (event.type) {
+                case 'PushEvent':
+                    const commitCount = event.payload.commits?.length || 0;
+                    activity = {
+                        type: 'commit',
+                        icon: 'bx-git-commit',
+                        content: `Pushed ${commitCount} commit${commitCount !== 1 ? 's' : ''} to ${event.repo.name}`,
+                        details: event.payload.commits?.[0]?.message || 'Recent code updates',
+                        date: event.created_at,
+                        repo: event.repo.name
+                    };
+                    break;
+                    
+                case 'CreateEvent':
+                    if (event.payload.ref_type === 'repository') {
+                        activity = {
+                            type: 'create',
+                            icon: 'bx-plus-circle',
+                            content: `Created new repository: ${event.repo.name}`,
+                            details: event.payload.description || 'New project started',
+                            date: event.created_at,
+                            repo: event.repo.name
+                        };
+                    }
+                    break;
+                    
+                case 'WatchEvent':
+                    activity = {
+                        type: 'star',
+                        icon: 'bx-star',
+                        content: `Starred ${event.repo.name}`,
+                        details: 'Found something interesting!',
+                        date: event.created_at,
+                        repo: event.repo.name
+                    };
+                    break;
+                    
+                case 'ForkEvent':
+                    activity = {
+                        type: 'fork',
+                        icon: 'bx-git-branch',
+                        content: `Forked ${event.repo.name}`,
+                        details: 'Contributing to open source',
+                        date: event.created_at,
+                        repo: event.repo.name
+                    };
+                    break;
+                    
+                case 'IssuesEvent':
+                    activity = {
+                        type: 'issue',
+                        icon: 'bx-bug',
+                        content: `${event.payload.action} issue in ${event.repo.name}`,
+                        details: event.payload.issue?.title || 'Working on project improvements',
+                        date: event.created_at,
+                        repo: event.repo.name
+                    };
+                    break;
+                    
+                case 'PullRequestEvent':
+                    activity = {
+                        type: 'pr',
+                        icon: 'bx-git-pull-request',
+                        content: `${event.payload.action} pull request in ${event.repo.name}`,
+                        details: event.payload.pull_request?.title || 'Code review and collaboration',
+                        date: event.created_at,
+                        repo: event.repo.name
+                    };
+                    break;
+            }
+            
+            if (activity) {
+                activities.push(activity);
+            }
+        });
+        
+        // Return latest 4-5 activities
+        return activities.slice(0, 5);
+    }
+    
+    displayActivity() {
+        const container = document.getElementById('sidebar-posts');
+        
+        if (!container) {
+            console.error('❌ sidebar-posts container not found!');
+            return;
+        }
+        
+        if (this.activities.length === 0) {
+            container.innerHTML = `
+                <div class="no-activity-message">
+                    <p>Recent GitHub activity will appear here.</p>
+                    <p style="font-size: 1.2rem; opacity: 0.7;">Keep coding! 🚀</p>
+                </div>
+            `;
+            return;
+        }
+        
+        console.log('🎨 Displaying', this.activities.length, 'activities');
+        
+        container.innerHTML = this.activities.map(activity => `
+            <div class="sidebar-post">
+                <div class="activity-header">
+                    <i class='bx ${activity.icon}' style="color: var(--main-color); margin-right: 0.5rem;"></i>
+                    <span class="activity-date">${this.formatDate(activity.date)}</span>
+                </div>
+                <div class="post-content">
+                    <strong>${activity.content}</strong>
+                    <p style="font-size: 1.1rem; opacity: 0.8; margin: 0.5rem 0 0 0;">${activity.details}</p>
+                </div>
+                <div class="activity-repo">
+                    <i class='bx bx-code-alt'></i>
+                    <span>${activity.repo}</span>
+                </div>
+            </div>
+        `).join('');
+        
+        // Animate activities appearing
+        const posts = container.querySelectorAll('.sidebar-post');
+        posts.forEach((post, index) => {
+            post.style.opacity = '0';
+            post.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                post.style.transition = 'all 0.5s ease';
+                post.style.opacity = '1';
+                post.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+        
+        console.log('✅ GitHub activity displayed successfully!');
+    }
+    
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffMinutes < 60) return `${diffMinutes}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays === 1) return '1 day ago';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return `${Math.floor(diffDays / 7)}w ago`;
+    }
+}

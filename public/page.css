@@ -1165,3 +1165,35 @@ span{
     flex-shrink: 0;
     flex-wrap: wrap;
 }
+
+/* GitHub Activity specific styles */
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+}
+
+.activity-date {
+    color: var(--main-color);
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.activity-repo {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.8rem;
+    font-size: 1rem;
+    color: var(--main-color);
+    opacity: 0.7;
+}
+
+.no-activity-message {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
