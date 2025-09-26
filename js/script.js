@@ -246,7 +246,6 @@ updateFilterText(category) {
 
 document.addEventListener('DOMContentLoaded', function() {    
     new GitHubProjects();
-    new LinkedInPosts(); 
 });
 
 
