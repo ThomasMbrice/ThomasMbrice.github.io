@@ -324,16 +324,16 @@ section{
 
 @keyframes words{
     0%, 20%{
-        content: "leading ML research";
+        content: "leading AI research";
     }
     21%, 40%{
-        content: "automating complex workflows";
+        content: "optimizing data pipelines";
     }
     41%, 60%{
-        content: "optimizing backend systems";
+        content: "automating complex workflows";
     }
     61%, 80%{
-        content: "containerizing applications";
+        content: "developing ML models";
     }
     81%, 100%{
         content: "building production systems";
