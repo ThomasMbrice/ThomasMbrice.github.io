@@ -1132,17 +1132,35 @@ span{
     }
 
     section {
-        padding: 9rem 4% 4rem;
+        min-height: auto;
+        padding: 7rem 4% 4rem;
     }
 
     .heading {
         font-size: 5.5rem;
-        margin: 3rem 0;
+        margin: 2rem 0;
+    }
+
+    /* Skills section overrides */
+    .skills {
+        min-height: auto;
+        padding: 7rem 4% 4rem;
+    }
+
+    /* Pathfinding section override */
+    .pathfinding-game {
+        min-height: auto;
+        padding: 7rem 4% 4rem;
+    }
+
+    /* Education section override */
+    .education {
+        padding: 5rem 4%;
     }
 
     /* Home */
     .home {
-        padding: 12rem 4% 4rem;
+        padding: 10rem 4% 3rem;
     }
 
     .home-content h1 {
@@ -1249,8 +1267,22 @@ span{
         font-size: 45%;
     }
 
+    section {
+        padding: 6rem 4% 3rem;
+    }
+
+    .home {
+        padding: 9rem 4% 3rem;
+    }
+
+    .skills,
+    .pathfinding-game {
+        padding: 6rem 4% 3rem;
+    }
+
     .heading {
         font-size: 4.5rem;
+        margin: 1.5rem 0;
     }
 
     .home-content h1 {

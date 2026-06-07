@@ -614,6 +614,9 @@ class PathfindingGame {
         if (window.innerWidth <= 768) {
             this.rows = 12;
             this.cols = 20;
+            // Re-position nodes to fit within the smaller grid (col 20 would be out of bounds)
+            this.startNode = { row: 6, col: 3 };
+            this.endNode = { row: 6, col: 17 };
             gridElement.style.gridTemplateColumns = `repeat(${this.cols}, 1fr)`;
             gridElement.style.gridTemplateRows = `repeat(${this.rows}, 1fr)`;
         }
