@@ -673,8 +673,13 @@ class PathfindingGame {
         gridElement.addEventListener('mousedown', (e) => this.handleMouseDown(e));
         gridElement.addEventListener('mouseover', (e) => this.handleMouseOver(e));
         gridElement.addEventListener('mouseup', () => this.handleMouseUp());
-        
+
         gridElement.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        // Touch support for mobile
+        gridElement.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        gridElement.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        gridElement.addEventListener('touchend', () => this.handleTouchEnd());
     }
     
     handleMouseDown(e) {
@@ -713,7 +718,55 @@ class PathfindingGame {
         this.isDrawing = false;
         this.movingNode = null;
     }
-    
+
+    handleTouchStart(e) {
+        if (this.isRunning) return;
+        e.preventDefault();
+
+        const touch = e.touches[0];
+        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (!element || !element.id.startsWith('cell-')) return;
+
+        const [, row, col] = element.id.split('-').map(Number);
+        const cell = this.grid[row][col];
+
+        if (cell.isStart || cell.isEnd) {
+            this.movingNode = cell.isStart ? 'start' : 'end';
+        } else {
+            this.isDrawing = true;
+            // Track whether we're adding or erasing so drag stays consistent
+            this.drawingWall = !cell.isWall;
+            this.toggleWall(row, col);
+        }
+    }
+
+    handleTouchMove(e) {
+        if (this.isRunning) return;
+        if (!this.isDrawing && !this.movingNode) return;
+        e.preventDefault();
+
+        const touch = e.touches[0];
+        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (!element || !element.id.startsWith('cell-')) return;
+
+        const [, row, col] = element.id.split('-').map(Number);
+
+        if (this.movingNode) {
+            this.moveNode(row, col);
+        } else if (this.isDrawing) {
+            const cell = this.grid[row][col];
+            if (!cell.isStart && !cell.isEnd && cell.isWall !== this.drawingWall) {
+                this.toggleWall(row, col);
+            }
+        }
+    }
+
+    handleTouchEnd() {
+        this.isDrawing = false;
+        this.movingNode = null;
+        this.drawingWall = null;
+    }
+
     moveNode(row, col) {
         const cell = this.grid[row][col];
         if (cell.isWall) return;

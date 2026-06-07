@@ -1168,10 +1168,10 @@ span{
         display: none;
     }
 
-    /* Venn — fix circle positions so they don't go off-screen */
+    /* Venn — proper equilateral triangle, 200px circles, 140px center-to-center */
     .venn-container {
-        height: 400px;
-        min-height: 400px;
+        height: 340px;
+        min-height: 340px;
     }
 
     .venn-circle {
@@ -1183,23 +1183,26 @@ span{
         min-height: 200px;
     }
 
+    /* Center at 50%-70px (left of center) */
     .ml-circle {
         top: 0;
-        left: 10%;
+        left: calc(50% - 170px);
         transform: none;
     }
 
+    /* Center at 50%+70px (right of center) */
     .ai-circle {
         top: 0;
-        right: 10%;
-        left: auto;
+        left: calc(50% - 30px);
+        right: auto;
         transform: none;
     }
 
+    /* Center at 50%, offset down by 140*sin(60°)=121px */
     .backend-circle {
-        top: 40%;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 121px;
+        left: calc(50% - 100px);
+        transform: none;
     }
 
     /* Projects */
@@ -1266,22 +1269,42 @@ span{
         width: 85%;
     }
 
-    /* Venn — switch to stacked layout on very small screens */
+    /* Venn — equilateral triangle, 140px circles, 100px center-to-center */
     .venn-container {
-        height: auto;
-        min-height: auto;
-        flex-direction: column;
-        gap: 2rem;
+        height: 240px;
+        min-height: 240px;
     }
 
     .venn-circle {
-        position: static !important;
-        width: 78vw !important;
-        height: 78vw !important;
-        max-width: 250px !important;
-        max-height: 250px !important;
-        min-width: auto !important;
-        min-height: auto !important;
+        position: absolute !important;
+        width: 140px !important;
+        height: 140px !important;
+        max-width: 140px !important;
+        max-height: 140px !important;
+        min-width: 140px !important;
+        min-height: 140px !important;
+    }
+
+    /* Center at 50%-50px */
+    .ml-circle {
+        top: 0 !important;
+        left: calc(50% - 120px) !important;
+        right: auto !important;
+        transform: none !important;
+    }
+
+    /* Center at 50%+50px */
+    .ai-circle {
+        top: 0 !important;
+        left: calc(50% - 20px) !important;
+        right: auto !important;
+        transform: none !important;
+    }
+
+    /* Center at 50%, offset down 100*sin(60°)=87px */
+    .backend-circle {
+        top: 87px !important;
+        left: calc(50% - 70px) !important;
         transform: none !important;
     }
 
@@ -1490,6 +1513,8 @@ span{
     max-width: 800px;
     width: 100%;
     aspect-ratio: 5/3;
+    touch-action: none;
+    user-select: none;
 }
 
 .grid-cell {
