@@ -514,6 +514,87 @@ span{
 }
 
 /* Projects Section */
+/* Combined Skills + Projects section */
+.work {
+    background: var(--bg-color);
+    color: var(--text-color);
+    padding: 100px 5%;
+}
+
+.work .heading {
+    margin-bottom: 1rem;
+}
+
+.work-hint {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--main-color);
+    margin-bottom: 5rem;
+}
+
+.work-layout {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Two-column layout on desktop: venn left, projects right */
+@media(min-width: 992px) {
+    .work-layout {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 5rem;
+    }
+
+    .work-skills {
+        flex: 0 0 auto;
+        width: 460px;
+        position: sticky;
+        top: 120px;
+    }
+
+    .work-projects {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 720px;
+    }
+
+    /* Fixed-size Venn triangle so it fits the narrower left column */
+    .work-skills .venn-container {
+        height: 400px;
+        min-height: 400px;
+        max-width: 100%;
+    }
+
+    .work-skills .venn-circle {
+        width: 240px;
+        height: 240px;
+        max-width: 240px;
+        max-height: 240px;
+        min-width: 240px;
+        min-height: 240px;
+    }
+
+    .work-skills .ml-circle {
+        top: 0;
+        left: calc(50% - 200px);
+        transform: none;
+    }
+
+    .work-skills .ai-circle {
+        top: 0;
+        left: calc(50% - 40px);
+        right: auto;
+        transform: none;
+    }
+
+    .work-skills .backend-circle {
+        top: 139px;
+        left: calc(50% - 120px);
+        transform: none;
+    }
+}
+
 .proj{
     background: var(--bg-color);
     color: var(--text-color);
@@ -1421,6 +1502,521 @@ span{
     background: var(--second-bg-color);
     padding: 100px 15px;
     min-height: 100vh;
+}
+
+/* Playground Tabs */
+.playground-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 4rem;
+}
+
+.playground-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.6rem;
+    font-weight: 500;
+    padding: 1.2rem 2.4rem;
+    border-radius: 1rem;
+    border: 2px solid var(--main-color);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.playground-tab i {
+    font-size: 1.8rem;
+}
+
+.playground-tab:hover {
+    background: rgba(217, 119, 6, 0.12);
+}
+
+.playground-tab.active {
+    background: var(--main-color);
+    color: var(--bg-color);
+}
+
+/* Playground Panels */
+.playground-panel {
+    display: none;
+}
+
+.playground-panel.active {
+    display: block;
+}
+
+/* ===================== Quantum Sandbox ===================== */
+.qc-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.qc-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem 3rem;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-color);
+    border: 2px solid var(--main-color);
+    border-radius: 1.5rem;
+    padding: 2rem 2.5rem;
+}
+
+.qc-control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.qc-label {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--main-color);
+}
+
+.qc-controls select {
+    font-size: 1.4rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.8rem;
+    border: 2px solid var(--main-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.qc-gate-palette {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.qc-gate-btn {
+    width: 4rem;
+    height: 4rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    border-radius: 0.8rem;
+    border: 2px solid var(--main-color);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.qc-gate-btn:hover {
+    background: var(--main-color);
+    color: var(--bg-color);
+}
+
+.qc-cnot-btn {
+    width: auto;
+    padding: 0 1.4rem;
+}
+
+.qc-chip {
+    font-size: 1.4rem;
+    font-weight: 500;
+    padding: 0.7rem 1.4rem;
+    border-radius: 0.8rem;
+    border: 2px solid var(--main-color);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.qc-chip:hover {
+    background: var(--main-color);
+    color: var(--bg-color);
+}
+
+.qc-actions {
+    gap: 1rem;
+}
+
+.qc-action-btn {
+    font-size: 1.4rem;
+    padding: 1rem 1.8rem;
+    height: auto;
+}
+
+/* Circuit diagram */
+.qc-circuit {
+    background: var(--bg-color);
+    border: 2px solid var(--main-color);
+    border-radius: 1.5rem;
+    padding: 1.5rem 2rem;
+    overflow-x: auto;
+}
+
+.qc-empty {
+    text-align: center;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    opacity: 0.55;
+    padding: 1.5rem 0;
+}
+
+.qc-wire {
+    display: flex;
+    align-items: center;
+    height: 5rem;
+}
+
+.qc-wire-label {
+    flex: 0 0 auto;
+    width: 3.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--main-color);
+}
+
+.qc-slot {
+    position: relative;
+    flex: 0 0 auto;
+    width: 5.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* horizontal wire line through each slot */
+.qc-slot::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(31, 41, 55, 0.35);
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.qc-gate {
+    position: relative;
+    z-index: 1;
+    width: 3.6rem;
+    height: 3.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--bg-color);
+    background: var(--main-color);
+    border-radius: 0.6rem;
+}
+
+.qc-dot {
+    position: relative;
+    z-index: 1;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    background: var(--main-color);
+}
+
+.qc-xor {
+    position: relative;
+    z-index: 1;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--main-color);
+    font-weight: 700;
+}
+
+/* vertical connector for CNOT */
+.qc-connector {
+    position: absolute;
+    left: 50%;
+    top: -1.5rem;
+    bottom: -1.5rem;
+    width: 2px;
+    background: var(--main-color);
+    transform: translateX(-50%);
+    z-index: 0;
+}
+
+/* Measurement result banner */
+.qc-result {
+    display: none;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--bg-color);
+    background: var(--main-color);
+    border-radius: 1rem;
+    padding: 1.2rem;
+}
+
+.qc-result-error {
+    background: #dc2626;
+}
+
+/* Probability histogram */
+.qc-histogram {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.8rem;
+    height: 26rem;
+    background: var(--bg-color);
+    border: 2px solid var(--main-color);
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem 1.5rem;
+}
+
+.qc-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+    min-width: 0;
+}
+
+.qc-bar-prob {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.4rem;
+    min-height: 1.6rem;
+}
+
+.qc-bar-track {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    max-width: 6rem;
+}
+
+.qc-bar-fill {
+    width: 100%;
+    height: 0;
+    background: var(--main-color);
+    border-radius: 0.5rem 0.5rem 0 0;
+    transition: height 0.5s ease, background 0.5s ease, opacity 0.3s ease;
+}
+
+.qc-bar-label {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-top: 0.6rem;
+    white-space: nowrap;
+}
+
+@media(max-width: 600px) {
+    .qc-bar-label { font-size: 1rem; }
+    .qc-bar-prob { font-size: 1.1rem; }
+    .qc-slot { width: 4.2rem; }
+}
+
+/* ===================== ML Simulator ===================== */
+.ml-container {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.ml-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 3rem;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-color);
+    border: 2px solid var(--main-color);
+    border-radius: 1.5rem;
+    padding: 2rem 2.5rem;
+}
+
+.ml-control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.ml-label {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--main-color);
+}
+
+.ml-chip {
+    font-size: 1.4rem;
+    font-weight: 500;
+    padding: 0.7rem 1.4rem;
+    border-radius: 0.8rem;
+    border: 2px solid var(--main-color);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ml-chip:hover {
+    background: rgba(217, 119, 6, 0.12);
+}
+
+.ml-chip.active {
+    background: var(--main-color);
+    color: var(--bg-color);
+}
+
+.ml-controls select {
+    font-size: 1.4rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.8rem;
+    border: 2px solid var(--main-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.ml-actions {
+    gap: 1rem;
+}
+
+.ml-btn {
+    font-size: 1.4rem;
+    padding: 1rem 1.6rem;
+    height: auto;
+}
+
+.ml-viz {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.ml-board, .ml-net {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1 300px;
+}
+
+#ml-canvas {
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    background: var(--bg-color);
+    border: 2px solid var(--main-color);
+    border-radius: 1.5rem;
+}
+
+#ml-net-canvas {
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    background: var(--bg-color);
+    border: 2px solid var(--main-color);
+    border-radius: 1.5rem;
+}
+
+.ml-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem 2.5rem;
+    background: var(--bg-color);
+    border: 2px solid var(--main-color);
+    border-radius: 1.5rem;
+    padding: 1.5rem 2rem;
+}
+
+.ml-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.ml-stat i {
+    font-size: 1.9rem;
+    color: var(--main-color);
+}
+
+.ml-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 1.4rem;
+    color: var(--text-color);
+}
+
+.ml-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.ml-dot {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+}
+
+.ml-dot-a { background: #d97706; }
+.ml-dot-b { background: #2563eb; }
+
+.ml-line-sample {
+    width: 2.4rem;
+    height: 3px;
+    border-radius: 2px;
+}
+
+.ml-line-pos { background: #d97706; }
+.ml-line-neg { background: #2563eb; }
+
+/* Placeholder for upcoming playgrounds */
+.playground-placeholder {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 8rem 2rem;
+    border: 2px dashed var(--main-color);
+    border-radius: 2rem;
+    background: rgba(245, 241, 235, 0.5);
+    color: var(--text-color);
+}
+
+.playground-placeholder i {
+    font-size: 6rem;
+    color: var(--main-color);
+    margin-bottom: 2rem;
+}
+
+.playground-placeholder h3 {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+}
+
+.playground-placeholder p {
+    font-size: 1.6rem;
+    opacity: 0.7;
 }
 
 .game-container {

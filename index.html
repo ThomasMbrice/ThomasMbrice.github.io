@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Portfolio</title>
+    <title>Thomas Mbrice — AI Research & Engineering</title>
+    <meta name="description" content="Thomas Mbrice — portfolio at the intersection of AI research and scalable engineering. Projects, skills, and an interactive algorithm playground.">
+    <meta name="author" content="Thomas Mbrice">
+
+    <!-- Open Graph / social preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Thomas Mbrice — AI Research & Engineering">
+    <meta property="og:description" content="Portfolio at the intersection of AI research and scalable engineering.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Thomas Mbrice — AI Research & Engineering">
+    <meta name="twitter:description" content="Portfolio at the intersection of AI research and scalable engineering.">
+
     <link rel="stylesheet" href="public/page.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -15,9 +26,8 @@
 
         <nav class="navbar">
             <a href="#home" class="active">Home</a>
-            <a href="#skills">Skills</a>
-            <a href="#proj">Projects</a>
-            <a href="#pathfinding">Playground!</a> 
+            <a href="#proj">Work</a>
+            <a href="#pathfinding">Playground!</a>
             <a href="#contact">Contact</a>
         </nav>
 
@@ -42,19 +52,18 @@
             <h3 class="text-animation">I'm currently <span></span></h3>
             
             <p>
-                I work at the intersection of AI research and scalable engineering. 
-                The most meaningful problems require both mathematical rigor and practical implementation. 
+                I work at the intersection of AI research and scalable engineering.
+                The most meaningful problems require both mathematical rigor and practical implementation.
                 <span>I build systems that transform complex theory into tangible value.</span>
             </p>
 
             <div class="social-icons">
-                <a href="https://www.linkedin.com/in/thomasmbrice/"><i class='bx bxl-linkedin' ></i></a>
-                <a href="https://github.com/ThomasMbrice"><i class='bx bxl-github' ></i></a>
+                <a href="https://www.linkedin.com/in/thomasmbrice/" aria-label="LinkedIn"><i class='bx bxl-linkedin' ></i></a>
+                <a href="https://github.com/ThomasMbrice" aria-label="GitHub"><i class='bx bxl-github' ></i></a>
             </div>
 
             <div class="btn-group">
-                <!--<a href="#" id="downloadBtn" class="btn">Resume</a>-->
-                <a href="https://www.linkedin.com/in/thomasmbrice/" class="btn">Resume</a>
+                <a href="ThomasMbriceResume.pdf" class="btn" target="_blank" download>Resume</a>
                 <a href="#contact" class="btn">Contact</a>
             </div>
         </div>
@@ -90,9 +99,13 @@
     </div>
     </section>
 
-        <section class="skills" id="skills">
-        <h2 class="heading">My <span>Skills</span></h2>
-        
+    <section class="work" id="proj">
+        <h2 class="heading">My <span>Work</span></h2>
+        <p class="work-hint">My skills — click one to filter the projects on the right.</p>
+
+        <div class="work-layout">
+        <!-- LEFT: Skills / Venn diagram -->
+        <div class="work-skills" id="skills">
         <div class="venn-container">
             <!-- ML Circle -->
             <div class="venn-circle ml-circle" data-category="ml">
@@ -168,16 +181,14 @@
             </div>
             -->
         </div>
-        </section>
+        </div>
+        <!-- end work-skills -->
 
-    <section class="proj" id="proj">
-        <h2 class="heading">Projects</h2>
+        <!-- RIGHT: Projects -->
+        <div class="work-projects">
 
         <!-- Filter Status and Reset -->
         <div class="filter-controls" style="text-align: center; margin-bottom: 2rem;">
-            <div id="filter-status" style="font-size: 1.6rem; color: var(--main-color); margin-bottom: 1rem;">
-                Showing: All Projects
-            </div>
             <button id="reset-filter" class="btn" style="display: none;">
                 <i class='bx bx-refresh'></i> Show All Projects
             </button>
@@ -197,14 +208,34 @@
         <div id="error" class="error" style="display: none; text-align: center; color: #dc2626;">
             Failed to load projects from GitHub.
         </div>
+        </div>
+        <!-- end work-projects -->
+        </div>
+        <!-- end work-layout -->
     </section>
 
     <section class="pathfinding-game" id="pathfinding">
     <h2 class="heading">Algorithm <span>Playground</span></h2>
+
+    <!-- Playground Tabs -->
+    <div class="playground-tabs">
+        <button class="playground-tab" data-tab="pathfinding-tab">
+            <i class='bx bx-target-lock'></i> Pathfinding
+        </button>
+        <button class="playground-tab" data-tab="quantum-tab">
+            <i class='bx bx-atom'></i> Quantum Computing
+        </button>
+        <button class="playground-tab active" data-tab="ml-tab">
+            <i class='bx bx-chip'></i> ML Simulation
+        </button>
+    </div>
+
+    <!-- Pathfinding Panel -->
+    <div class="playground-panel" id="pathfinding-tab">
     <p style="text-align: center; font-size: 1.6rem; margin-bottom: 3rem; color: var(--text-color);">
         Interactive pathfinding visualization - Watch algorithms solve mazes in real-time!
     </p>
-    
+
     <div class="game-container">
         <!-- Game Controls -->
         <div class="game-controls">
@@ -280,6 +311,141 @@
             </div>
         </div>
     </div>
+    </div>
+    <!-- end pathfinding panel -->
+
+    <!-- Quantum Computing Panel -->
+    <div class="playground-panel" id="quantum-tab">
+        <p style="text-align: center; font-size: 1.6rem; margin-bottom: 3rem; color: var(--text-color);">
+            3-qubit state simulator — build a circuit and watch the probability distribution evolve.
+            Bar color encodes each state's quantum phase.
+        </p>
+
+        <div class="qc-container">
+            <!-- Controls -->
+            <div class="qc-controls">
+                <div class="qc-control-group">
+                    <span class="qc-label">Presets:</span>
+                    <button class="qc-chip" data-preset="superposition">Superposition</button>
+                    <button class="qc-chip" data-preset="bell">Bell state</button>
+                    <button class="qc-chip" data-preset="ghz">GHZ</button>
+                </div>
+
+                <div class="qc-control-group">
+                    <span class="qc-label">Gate on</span>
+                    <select id="qc-qubit-select">
+                        <option value="0">q0</option>
+                        <option value="1">q1</option>
+                        <option value="2">q2</option>
+                    </select>
+                    <div class="qc-gate-palette">
+                        <button class="qc-gate-btn" data-gate="H" title="Hadamard">H</button>
+                        <button class="qc-gate-btn" data-gate="X" title="Pauli-X (NOT)">X</button>
+                        <button class="qc-gate-btn" data-gate="Y" title="Pauli-Y">Y</button>
+                        <button class="qc-gate-btn" data-gate="Z" title="Pauli-Z">Z</button>
+                        <button class="qc-gate-btn" data-gate="S" title="Phase (S)">S</button>
+                        <button class="qc-gate-btn" data-gate="T" title="T gate">T</button>
+                    </div>
+                </div>
+
+                <div class="qc-control-group">
+                    <span class="qc-label">CNOT</span>
+                    <select id="qc-cnot-control">
+                        <option value="0">control q0</option>
+                        <option value="1">control q1</option>
+                        <option value="2">control q2</option>
+                    </select>
+                    <select id="qc-cnot-target">
+                        <option value="1">target q1</option>
+                        <option value="0">target q0</option>
+                        <option value="2">target q2</option>
+                    </select>
+                    <button class="qc-gate-btn qc-cnot-btn" id="qc-add-cnot">Add</button>
+                </div>
+
+                <div class="qc-control-group qc-actions">
+                    <button class="btn qc-action-btn" id="qc-measure"><i class='bx bx-crosshair'></i> Measure</button>
+                    <button class="btn qc-action-btn btn-secondary" id="qc-undo"><i class='bx bx-undo'></i> Undo</button>
+                    <button class="btn qc-action-btn btn-secondary" id="qc-reset"><i class='bx bx-refresh'></i> Reset</button>
+                </div>
+            </div>
+
+            <!-- Circuit diagram -->
+            <div class="qc-circuit" id="qc-circuit"></div>
+
+            <!-- Measurement result -->
+            <div class="qc-result" id="qc-result"></div>
+
+            <!-- Probability histogram -->
+            <div class="qc-histogram" id="qc-histogram"></div>
+        </div>
+    </div>
+
+    <!-- ML Simulation Panel -->
+    <div class="playground-panel active" id="ml-tab">
+        <p style="text-align: center; font-size: 1.6rem; margin-bottom: 3rem; color: var(--text-color);">
+            Neural network playground — a small multilayer net learns a non-linear
+            decision boundary with backpropagation. Watch the surface bend to fit the data.
+        </p>
+
+        <div class="ml-container">
+            <!-- Controls -->
+            <div class="ml-controls">
+                <div class="ml-control-group">
+                    <span class="ml-label">Dataset:</span>
+                    <button class="ml-chip active" data-dataset="circles">Circles</button>
+                    <button class="ml-chip" data-dataset="moons">Two Moons</button>
+                    <button class="ml-chip" data-dataset="xor">XOR</button>
+                    <button class="ml-chip" data-dataset="spiral">Spiral</button>
+                </div>
+
+                <div class="ml-control-group">
+                    <span class="ml-label">Network:</span>
+                    <select id="ml-arch">
+                        <option value="8,8">2 – 8 – 8 – 1</option>
+                        <option value="16,16" selected>2 – 16 – 16 – 1</option>
+                        <option value="12,12,12">2 – 12 – 12 – 12 – 1</option>
+                    </select>
+                </div>
+
+                <div class="ml-control-group">
+                    <span class="ml-label">Learning rate:</span>
+                    <input type="range" id="ml-lr" min="1" max="100" value="30">
+                    <span id="ml-lr-value">0.30</span>
+                </div>
+
+                <div class="ml-control-group ml-actions">
+                    <button class="btn ml-btn" id="ml-train"><i class='bx bx-play'></i> Train</button>
+                    <button class="btn ml-btn btn-secondary" id="ml-reset"><i class='bx bx-refresh'></i> Reset</button>
+                </div>
+            </div>
+
+            <!-- Visualization: decision surface + network diagram -->
+            <div class="ml-viz">
+                <div class="ml-board">
+                    <canvas id="ml-canvas" width="440" height="440"></canvas>
+                </div>
+                <div class="ml-net">
+                    <canvas id="ml-net-canvas" width="320" height="440"></canvas>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="ml-stats">
+                <div class="ml-stat"><i class='bx bx-revision'></i> <span id="ml-epoch">Epoch 0</span></div>
+                <div class="ml-stat"><i class='bx bx-line-chart'></i> <span id="ml-loss">Loss —</span></div>
+                <div class="ml-stat"><i class='bx bx-check-circle'></i> <span id="ml-acc">Accuracy —</span></div>
+            </div>
+
+            <!-- Legend -->
+            <div class="ml-legend">
+                <div class="ml-legend-item"><span class="ml-dot ml-dot-a"></span> Class A</div>
+                <div class="ml-legend-item"><span class="ml-dot ml-dot-b"></span> Class B</div>
+                <div class="ml-legend-item"><span class="ml-line-sample ml-line-pos"></span> positive weight</div>
+                <div class="ml-legend-item"><span class="ml-line-sample ml-line-neg"></span> negative weight</div>
+            </div>
+        </div>
+    </div>
     </section>
 
     <section class="contact" id="contact">
@@ -308,18 +474,15 @@
 
     <footer class="footer">
         <div class="social">
-            <a href="https://www.linkedin.com/in/thomasmbrice/"><i class='bx bxl-linkedin' ></i></a>
-            <a href="https://github.com/ThomasMbrice"><i class='bx bxl-github' ></i></a>
+            <a href="https://www.linkedin.com/in/thomasmbrice/" aria-label="LinkedIn"><i class='bx bxl-linkedin' ></i></a>
+            <a href="https://github.com/ThomasMbrice" aria-label="GitHub"><i class='bx bxl-github' ></i></a>
         </div>
         <ul class="lis">
             <li>
                 <a href="#home">Home</a>
             </li>
             <li>
-                <a href="#skills">Skills</a>
-            </li>
-            <li>
-                <a href="#proj">Projects</a>
+                <a href="#proj">Work</a>
             </li>
             <li>
                 <a href="#contact">Contact</a>

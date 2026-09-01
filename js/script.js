@@ -296,19 +296,26 @@ window.addEventListener('resize', checkScreenSize);
 
 document.addEventListener('DOMContentLoaded', function() {
     new GitHubProjects();
-    new GitHubActivity(); 
+    new GitHubActivity();
     new PathfindingGame();
+    new QuantumSandbox();
+    new MLSimulator();
 
-    document.getElementById('downloadBtn').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default anchor click behavior
+    // Playground tab switching
+    const playgroundTabs = document.querySelectorAll('.playground-tab');
+    playgroundTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetId = tab.getAttribute('data-tab');
 
-        var link = document.createElement('a');
-        link.href = 'public/resume/ThomasMbriceResume.png'; // Path to your resume
-        link.download = 'ThomasMbriceResume.png'; // Name of the file to be downloaded
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            playgroundTabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.playground-panel').forEach(p => p.classList.remove('active'));
+
+            tab.classList.add('active');
+            const panel = document.getElementById(targetId);
+            if (panel) panel.classList.add('active');
+        });
     });
+
     const imageContainer = document.getElementById('contactImage');
     if (imageContainer) {
         const img = new Image();
@@ -1149,5 +1156,664 @@ class PathfindingGame {
     
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+
+// ============================================================
+// Quantum Sandbox — 3-qubit state-vector simulator
+// ============================================================
+
+// Minimal complex-number helpers
+const cx = (re, im = 0) => ({ re, im });
+const cAdd = (a, b) => ({ re: a.re + b.re, im: a.im + b.im });
+const cMul = (a, b) => ({ re: a.re * b.re - a.im * b.im, im: a.re * b.im + a.im * b.re });
+
+class QuantumSandbox {
+    constructor() {
+        this.n = 3;                 // number of qubits
+        this.size = 1 << this.n;    // 8 basis states
+        this.circuit = [];          // list of operations
+        this.collapsed = null;      // measured basis index, or null
+
+        // 2x2 gate matrices
+        const R = Math.SQRT1_2;
+        this.gates = {
+            H: [[cx(R), cx(R)], [cx(R), cx(-R)]],
+            X: [[cx(0), cx(1)], [cx(1), cx(0)]],
+            Y: [[cx(0), cx(0, -1)], [cx(0, 1), cx(0)]],
+            Z: [[cx(1), cx(0)], [cx(0), cx(-1)]],
+            S: [[cx(1), cx(0)], [cx(0), cx(0, 1)]],
+            T: [[cx(1), cx(0)], [cx(0), cx(R, R)]]
+        };
+
+        // Bail out silently if the markup isn't present
+        this.histogramEl = document.getElementById('qc-histogram');
+        this.circuitEl = document.getElementById('qc-circuit');
+        this.resultEl = document.getElementById('qc-result');
+        if (!this.histogramEl || !this.circuitEl) return;
+
+        this.buildHistogram();
+        this.bindControls();
+        this.render();
+    }
+
+    // ---- State computation -------------------------------------------------
+
+    computeState() {
+        // Start in |000>
+        let state = new Array(this.size).fill(null).map((_, i) => cx(i === 0 ? 1 : 0));
+        for (const op of this.circuit) {
+            state = op.type === 'cnot'
+                ? this.applyCNOT(state, op.control, op.target)
+                : this.applyGate(state, this.gates[op.gate], op.qubit);
+        }
+        return state;
+    }
+
+    applyGate(state, U, qubit) {
+        const out = state.slice();
+        const p = this.n - 1 - qubit; // bit position of this qubit
+        for (let i = 0; i < this.size; i++) {
+            if ((i >> p) & 1) continue;         // handle each pair once
+            const j = i | (1 << p);
+            const a = state[i], b = state[j];
+            out[i] = cAdd(cMul(U[0][0], a), cMul(U[0][1], b));
+            out[j] = cAdd(cMul(U[1][0], a), cMul(U[1][1], b));
+        }
+        return out;
+    }
+
+    applyCNOT(state, control, target) {
+        const out = state.slice();
+        const pc = this.n - 1 - control;
+        const pt = this.n - 1 - target;
+        for (let i = 0; i < this.size; i++) {
+            if ((i >> pc) & 1) out[i] = state[i ^ (1 << pt)]; // flip target when control set
+        }
+        return out;
+    }
+
+    // ---- Basis-state label, e.g. index 5 -> "101" --------------------------
+    label(i) {
+        return i.toString(2).padStart(this.n, '0');
+    }
+
+    // ---- Rendering ---------------------------------------------------------
+
+    buildHistogram() {
+        this.histogramEl.innerHTML = '';
+        this.bars = [];
+        for (let i = 0; i < this.size; i++) {
+            const col = document.createElement('div');
+            col.className = 'qc-bar-col';
+            col.innerHTML = `
+                <div class="qc-bar-prob"></div>
+                <div class="qc-bar-track"><div class="qc-bar-fill"></div></div>
+                <div class="qc-bar-label">|${this.label(i)}⟩</div>`;
+            this.histogramEl.appendChild(col);
+            this.bars.push({
+                prob: col.querySelector('.qc-bar-prob'),
+                fill: col.querySelector('.qc-bar-fill')
+            });
+        }
+    }
+
+    render() {
+        // After a measurement the circuit is rebuilt to the collapsed basis
+        // state, so computeState() reflects the collapse in every case.
+        const state = this.computeState();
+
+        for (let i = 0; i < this.size; i++) {
+            const a = state[i];
+            const prob = a.re * a.re + a.im * a.im;
+            const phase = Math.atan2(a.im, a.re);
+            const bar = this.bars[i];
+
+            bar.fill.style.height = `${(prob * 100).toFixed(2)}%`;
+            if (prob > 0.0005) {
+                const hue = ((phase * 180 / Math.PI) + 360) % 360;
+                bar.fill.style.background = `hsl(${hue}, 65%, 55%)`;
+                bar.fill.style.opacity = '1';
+                bar.prob.textContent = `${(prob * 100).toFixed(0)}%`;
+            } else {
+                bar.fill.style.opacity = '0.15';
+                bar.prob.textContent = '';
+            }
+        }
+
+        this.renderCircuit();
+    }
+
+    renderCircuit() {
+        // One row per qubit; one column per operation (moment)
+        let html = '';
+        for (let q = 0; q < this.n; q++) {
+            html += `<div class="qc-wire"><div class="qc-wire-label">q${q}</div>`;
+            for (const op of this.circuit) {
+                html += `<div class="qc-slot">${this.slotContent(op, q)}</div>`;
+            }
+            html += `</div>`;
+        }
+        this.circuitEl.innerHTML = this.circuit.length
+            ? html
+            : `<div class="qc-empty">Empty circuit — add a gate or pick a preset above.</div>`;
+    }
+
+    slotContent(op, q) {
+        if (op.type === 'cnot') {
+            const lo = Math.min(op.control, op.target);
+            const hi = Math.max(op.control, op.target);
+            const connector = (q > lo && q <= hi) || (q >= lo && q < hi)
+                ? '<span class="qc-connector"></span>' : '';
+            if (q === op.control) return `${connector}<span class="qc-dot"></span>`;
+            if (q === op.target) return `${connector}<span class="qc-xor">⊕</span>`;
+            if (q > lo && q < hi) return connector;
+            return '';
+        }
+        return op.qubit === q ? `<span class="qc-gate qc-gate-${op.gate}">${op.gate}</span>` : '';
+    }
+
+    // ---- Actions -----------------------------------------------------------
+
+    addGate(gate, qubit) {
+        this.collapsed = null;
+        this.clearResult();
+        this.circuit.push({ type: 'gate', gate, qubit });
+        this.render();
+    }
+
+    addCNOT(control, target) {
+        if (control === target) {
+            this.showResult('Control and target must differ.', true);
+            return;
+        }
+        this.collapsed = null;
+        this.clearResult();
+        this.circuit.push({ type: 'cnot', control, target });
+        this.render();
+    }
+
+    undo() {
+        this.collapsed = null;
+        this.clearResult();
+        this.circuit.pop();
+        this.render();
+    }
+
+    reset() {
+        this.collapsed = null;
+        this.clearResult();
+        this.circuit = [];
+        this.render();
+    }
+
+    preset(name) {
+        this.collapsed = null;
+        this.clearResult();
+        if (name === 'superposition') {
+            this.circuit = [
+                { type: 'gate', gate: 'H', qubit: 0 },
+                { type: 'gate', gate: 'H', qubit: 1 },
+                { type: 'gate', gate: 'H', qubit: 2 }
+            ];
+        } else if (name === 'bell') {
+            this.circuit = [
+                { type: 'gate', gate: 'H', qubit: 0 },
+                { type: 'cnot', control: 0, target: 1 }
+            ];
+        } else if (name === 'ghz') {
+            this.circuit = [
+                { type: 'gate', gate: 'H', qubit: 0 },
+                { type: 'cnot', control: 0, target: 1 },
+                { type: 'cnot', control: 1, target: 2 }
+            ];
+        }
+        this.render();
+    }
+
+    measure() {
+        const state = this.computeState();
+        const probs = state.map(a => a.re * a.re + a.im * a.im);
+        const r = Math.random();
+        let acc = 0, outcome = 0;
+        for (let i = 0; i < this.size; i++) {
+            acc += probs[i];
+            if (r <= acc) { outcome = i; break; }
+        }
+        // Collapse: rebuild circuit as X gates producing the measured basis state
+        this.collapsed = outcome;
+        this.circuit = [];
+        for (let q = 0; q < this.n; q++) {
+            if ((outcome >> (this.n - 1 - q)) & 1) {
+                this.circuit.push({ type: 'gate', gate: 'X', qubit: q });
+            }
+        }
+        this.render();
+        this.showResult(`Measured |${this.label(outcome)}⟩ — state collapsed.`);
+    }
+
+    showResult(msg, isError = false) {
+        if (!this.resultEl) return;
+        this.resultEl.textContent = msg;
+        this.resultEl.style.display = 'block';
+        this.resultEl.classList.toggle('qc-result-error', isError);
+    }
+
+    clearResult() {
+        if (this.resultEl) this.resultEl.style.display = 'none';
+    }
+
+    // ---- Wiring ------------------------------------------------------------
+
+    bindControls() {
+        const qubitSelect = document.getElementById('qc-qubit-select');
+
+        document.querySelectorAll('.qc-gate-btn[data-gate]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.addGate(btn.dataset.gate, parseInt(qubitSelect.value, 10));
+            });
+        });
+
+        document.getElementById('qc-add-cnot').addEventListener('click', () => {
+            const control = parseInt(document.getElementById('qc-cnot-control').value, 10);
+            const target = parseInt(document.getElementById('qc-cnot-target').value, 10);
+            this.addCNOT(control, target);
+        });
+
+        document.querySelectorAll('.qc-chip[data-preset]').forEach(btn => {
+            btn.addEventListener('click', () => this.preset(btn.dataset.preset));
+        });
+
+        document.getElementById('qc-undo').addEventListener('click', () => this.undo());
+        document.getElementById('qc-reset').addEventListener('click', () => this.reset());
+        document.getElementById('qc-measure').addEventListener('click', () => this.measure());
+    }
+}
+
+
+// ============================================================
+// ML Simulator — neural network playground (MLP + backprop)
+// ============================================================
+
+class MLSimulator {
+    constructor() {
+        this.canvas = document.getElementById('ml-canvas');
+        this.netCanvas = document.getElementById('ml-net-canvas');
+        if (!this.canvas || !this.netCanvas) return; // markup not present
+
+        this.ctx = this.canvas.getContext('2d');
+        this.netCtx = this.netCanvas.getContext('2d');
+        this.W = this.canvas.width;
+        this.H = this.canvas.height;
+
+        this.data = [];
+        this.lr = 0.3;
+        this.dataset = 'circles';
+        this.hidden = [16, 16];
+        this.epoch = 0;
+        this.lastLoss = null;
+        this.timer = null;
+
+        // network weights/biases
+        this.weights = [];
+        this.biases = [];
+        this.layerSizes = [];
+
+        // class colors
+        this.colorA = [217, 119, 6];  // orange -> class 1
+        this.colorB = [37, 99, 235];  // blue   -> class 0
+
+        this.bindControls();
+        this.generateData();
+        this.buildNet(this.hidden);
+        this.render();
+    }
+
+    // ---- Math helpers ------------------------------------------------------
+    randn() {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    }
+    sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+
+    toNorm(px, py) {
+        return { nx: (px / this.W) * 2 - 1, ny: -((py / this.H) * 2 - 1) };
+    }
+    toPx(nx, ny) {
+        return { px: (nx + 1) / 2 * this.W, py: (1 - ny) / 2 * this.H };
+    }
+
+    // ---- Network -----------------------------------------------------------
+    buildNet(hidden) {
+        this.layerSizes = [2, ...hidden, 1];
+        this.weights = [];
+        this.biases = [];
+        for (let l = 0; l < this.layerSizes.length - 1; l++) {
+            const inS = this.layerSizes[l];
+            const outS = this.layerSizes[l + 1];
+            const scale = Math.sqrt(2 / (inS + outS)); // Xavier init
+            const Wl = [];
+            const bl = [];
+            for (let i = 0; i < outS; i++) {
+                const row = [];
+                for (let j = 0; j < inS; j++) row.push(this.randn() * scale);
+                Wl.push(row);
+                bl.push(0);
+            }
+            this.weights.push(Wl);
+            this.biases.push(bl);
+        }
+        this.epoch = 0;
+        this.lastLoss = null;
+    }
+
+    forward(input) {
+        const acts = [input];
+        let a = input;
+        const L = this.weights.length;
+        for (let l = 0; l < L; l++) {
+            const inS = this.layerSizes[l];
+            const outS = this.layerSizes[l + 1];
+            const out = new Array(outS);
+            for (let i = 0; i < outS; i++) {
+                let s = this.biases[l][i];
+                for (let j = 0; j < inS; j++) s += this.weights[l][i][j] * a[j];
+                out[i] = (l === L - 1) ? this.sigmoid(s) : Math.tanh(s);
+            }
+            acts.push(out);
+            a = out;
+        }
+        return acts;
+    }
+
+    predict(nx, ny) {
+        const acts = this.forward([nx, ny]);
+        return acts[acts.length - 1][0];
+    }
+
+    trainStep() {
+        const L = this.weights.length;
+        const N = this.data.length;
+        if (N === 0) return 0;
+
+        const gW = this.weights.map(m => m.map(row => row.map(() => 0)));
+        const gB = this.biases.map(v => v.map(() => 0));
+        let loss = 0;
+
+        for (const p of this.data) {
+            const acts = this.forward([p.x, p.y]);
+            const aL = acts[L][0];
+            const y = p.label;
+            const ac = Math.min(Math.max(aL, 1e-7), 1 - 1e-7);
+            loss += -(y * Math.log(ac) + (1 - y) * Math.log(1 - ac));
+
+            let delta = [aL - y]; // sigmoid + cross-entropy
+            for (let l = L - 1; l >= 0; l--) {
+                const inS = this.layerSizes[l];
+                const outS = this.layerSizes[l + 1];
+                for (let i = 0; i < outS; i++) {
+                    gB[l][i] += delta[i];
+                    for (let j = 0; j < inS; j++) gW[l][i][j] += delta[i] * acts[l][j];
+                }
+                if (l > 0) {
+                    const nd = new Array(inS).fill(0);
+                    for (let j = 0; j < inS; j++) {
+                        let s = 0;
+                        for (let i = 0; i < outS; i++) s += this.weights[l][i][j] * delta[i];
+                        nd[j] = s * (1 - acts[l][j] * acts[l][j]); // tanh'
+                    }
+                    delta = nd;
+                }
+            }
+        }
+
+        const lr = this.lr;
+        for (let l = 0; l < L; l++) {
+            for (let i = 0; i < this.biases[l].length; i++) {
+                this.biases[l][i] -= lr * gB[l][i] / N;
+                for (let j = 0; j < this.weights[l][i].length; j++) {
+                    this.weights[l][i][j] -= lr * gW[l][i][j] / N;
+                }
+            }
+        }
+        this.epoch++;
+        this.lastLoss = loss / N;
+        return this.lastLoss;
+    }
+
+    accuracy() {
+        if (this.data.length === 0) return null;
+        let correct = 0;
+        for (const p of this.data) {
+            if ((this.predict(p.x, p.y) > 0.5 ? 1 : 0) === p.label) correct++;
+        }
+        return correct / this.data.length;
+    }
+
+    // ---- Datasets ----------------------------------------------------------
+    generateData() {
+        this.data = [];
+        const noise = (s) => (Math.random() - 0.5) * s;
+        const n = 70;
+
+        if (this.dataset === 'spiral') {
+            for (let arm = 0; arm < 2; arm++) {
+                for (let i = 0; i < n; i++) {
+                    const r = (i / n) * 0.9;
+                    const a = (i / n) * 3.2 * Math.PI + arm * Math.PI;
+                    this.data.push({
+                        x: r * Math.cos(a) + noise(0.06),
+                        y: r * Math.sin(a) + noise(0.06),
+                        label: arm === 0 ? 1 : 0
+                    });
+                }
+            }
+        } else if (this.dataset === 'moons') {
+            for (let i = 0; i < n; i++) {
+                const t = Math.PI * (i / (n - 1));
+                this.data.push({ x: 0.7 * Math.cos(t) - 0.25 + noise(0.08), y: 0.7 * Math.sin(t) - 0.2 + noise(0.08), label: 1 });
+                this.data.push({ x: 0.7 * Math.cos(t) + 0.25 + noise(0.08), y: -0.7 * Math.sin(t) + 0.2 + noise(0.08), label: 0 });
+            }
+        } else if (this.dataset === 'circles') {
+            for (let i = 0; i < n; i++) {
+                const a = Math.random() * 2 * Math.PI;
+                const rIn = Math.random() * 0.35;
+                this.data.push({ x: rIn * Math.cos(a), y: rIn * Math.sin(a), label: 1 });
+                const rOut = 0.6 + Math.random() * 0.3;
+                this.data.push({ x: rOut * Math.cos(a), y: rOut * Math.sin(a), label: 0 });
+            }
+        } else if (this.dataset === 'xor') {
+            for (let i = 0; i < 2 * n; i++) {
+                const x = (Math.random() * 2 - 1) * 0.9;
+                const y = (Math.random() * 2 - 1) * 0.9;
+                this.data.push({ x, y, label: (x * y > 0) ? 1 : 0 });
+            }
+        }
+    }
+
+    // ---- Rendering ---------------------------------------------------------
+    render() {
+        this.drawSurface();
+        this.drawNet();
+        this.updateStats();
+    }
+
+    lerpColor(t) {
+        // blue -> white -> orange, gives a light middle band near p=0.5
+        const white = [250, 248, 245];
+        let c;
+        if (t < 0.5) {
+            const k = t * 2;
+            c = this.colorB.map((v, i) => v + (white[i] - v) * k);
+        } else {
+            const k = (t - 0.5) * 2;
+            c = white.map((v, i) => v + (this.colorA[i] - v) * k);
+        }
+        return `rgba(${c[0] | 0}, ${c[1] | 0}, ${c[2] | 0}, 0.75)`;
+    }
+
+    drawSurface() {
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, this.W, this.H);
+
+        const step = 8;
+        for (let px = 0; px < this.W; px += step) {
+            for (let py = 0; py < this.H; py += step) {
+                const { nx, ny } = this.toNorm(px + step / 2, py + step / 2);
+                ctx.fillStyle = this.lerpColor(this.predict(nx, ny));
+                ctx.fillRect(px, py, step, step);
+            }
+        }
+
+        // data points
+        for (const p of this.data) {
+            const { px, py } = this.toPx(p.x, p.y);
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            const c = p.label === 1 ? this.colorA : this.colorB;
+            ctx.fillStyle = `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+            ctx.fill();
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#faf8f5';
+            ctx.stroke();
+        }
+    }
+
+    drawNet() {
+        const ctx = this.netCtx;
+        const W = this.netCanvas.width;
+        const H = this.netCanvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        const nL = this.layerSizes.length;
+        const marginX = 34;
+        const colGap = (W - 2 * marginX) / (nL - 1);
+        const maxNodes = Math.max(...this.layerSizes);
+        const nodeGap = H / (maxNodes + 1);
+        const radius = Math.min(9, nodeGap * 0.38);
+
+        const nodePos = (l, i) => {
+            const count = this.layerSizes[l];
+            const totalH = (count - 1) * nodeGap;
+            return { x: marginX + l * colGap, y: H / 2 - totalH / 2 + i * nodeGap };
+        };
+
+        // connections
+        for (let l = 0; l < nL - 1; l++) {
+            const inS = this.layerSizes[l];
+            const outS = this.layerSizes[l + 1];
+            for (let i = 0; i < outS; i++) {
+                for (let j = 0; j < inS; j++) {
+                    const w = this.weights[l][i][j];
+                    const a = nodePos(l, j);
+                    const b = nodePos(l + 1, i);
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    const mag = Math.min(Math.abs(w), 3);
+                    ctx.lineWidth = 0.3 + mag * 1.1;
+                    const col = w >= 0 ? this.colorA : this.colorB;
+                    ctx.strokeStyle = `rgba(${col[0]}, ${col[1]}, ${col[2]}, ${0.15 + Math.min(mag / 3, 1) * 0.6})`;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // nodes
+        for (let l = 0; l < nL; l++) {
+            for (let i = 0; i < this.layerSizes[l]; i++) {
+                const p = nodePos(l, i);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#faf8f5';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#d97706';
+                ctx.stroke();
+            }
+        }
+    }
+
+    updateStats() {
+        document.getElementById('ml-epoch').textContent = `Epoch ${this.epoch}`;
+        document.getElementById('ml-loss').textContent =
+            this.lastLoss === null ? 'Loss —' : `Loss ${this.lastLoss.toFixed(3)}`;
+        const acc = this.accuracy();
+        document.getElementById('ml-acc').textContent =
+            acc === null ? 'Accuracy —' : `Accuracy ${(acc * 100).toFixed(0)}%`;
+    }
+
+    // ---- Actions -----------------------------------------------------------
+    startTraining() {
+        if (this.timer) { this.stopTraining(); return; }
+        this.setTrainLabel(true);
+        this.timer = setInterval(() => {
+            for (let k = 0; k < 5; k++) this.trainStep(); // a few steps per frame
+            this.render();
+            if (this.epoch > 8000) this.stopTraining();
+        }, 60);
+    }
+
+    stopTraining() {
+        clearInterval(this.timer);
+        this.timer = null;
+        this.setTrainLabel(false);
+    }
+
+    setTrainLabel(training) {
+        const btn = document.getElementById('ml-train');
+        btn.innerHTML = training
+            ? "<i class='bx bx-pause'></i> Stop"
+            : "<i class='bx bx-play'></i> Train";
+    }
+
+    reset() {
+        this.stopTraining();
+        this.buildNet(this.hidden);
+        this.render();
+    }
+
+    setDataset(name) {
+        this.stopTraining();
+        this.dataset = name;
+        this.generateData();
+        this.buildNet(this.hidden);
+        this.render();
+    }
+
+    setArch(sizes) {
+        this.stopTraining();
+        this.hidden = sizes;
+        this.buildNet(this.hidden);
+        this.render();
+    }
+
+    // ---- Wiring ------------------------------------------------------------
+    bindControls() {
+        document.querySelectorAll('.ml-chip[data-dataset]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ml-chip').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.setDataset(btn.dataset.dataset);
+            });
+        });
+
+        document.getElementById('ml-arch').addEventListener('change', (e) => {
+            const sizes = e.target.value.split(',').map(v => parseInt(v, 10));
+            this.setArch(sizes);
+        });
+
+        const lr = document.getElementById('ml-lr');
+        const lrValue = document.getElementById('ml-lr-value');
+        lr.addEventListener('input', () => {
+            this.lr = parseInt(lr.value, 10) / 100;
+            lrValue.textContent = this.lr.toFixed(2);
+        });
+
+        document.getElementById('ml-train').addEventListener('click', () => this.startTraining());
+        document.getElementById('ml-reset').addEventListener('click', () => this.reset());
     }
 }
