@@ -84,9 +84,9 @@ export function renderLaptop(el, reposPromise) {
               <div class="os-prompt">$ ./playground --list</div>
               <p class="os-muted">Interactive simulations I've built — they run in the classic view of the site.</p>
               <ul class="os-lab">
-                <li><a href="index.html#pathfinding">pathfinding/</a> A*, Dijkstra, BFS, DFS racing through mazes you draw</li>
-                <li><a href="index.html#pathfinding">quantum/</a> a 3-qubit state-vector simulator with phase-colored amplitudes</li>
-                <li><a href="index.html#pathfinding">neural-net/</a> a tiny MLP learning decision boundaries live in your browser</li>
+                <li><a href="classic.html#pathfinding">pathfinding/</a> A*, Dijkstra, BFS, DFS racing through mazes you draw</li>
+                <li><a href="classic.html#pathfinding">quantum/</a> a 3-qubit state-vector simulator with phase-colored amplitudes</li>
+                <li><a href="classic.html#pathfinding">neural-net/</a> a tiny MLP learning decision boundaries live in your browser</li>
               </ul>
             </div>
           </section>

@@ -28,7 +28,7 @@ loadEnvironment(renderer, scene);
 
 // ---------- Season / time of day ----------
 // 'auto' follows the visitor's date and clock; the picker lets you preview the others.
-// Also settable by URL: office.html?season=winter&time=night
+// Also settable by URL: ?season=winter&time=night
 
 const seasonSelect = document.getElementById('season');
 const timeSelect = document.getElementById('time');
@@ -97,7 +97,7 @@ function flyTo(name, duration = 1.1) {
 let mode = 'overview';
 let pulledBook = null;
 
-// Deep links: office.html#resume, #laptop, #books, #books/3, #contact
+// Deep links: #resume, #laptop, #books, #books/3, #contact
 const HASH_TO_VIEW = { laptop: 'laptop', resume: 'paper', books: 'shelf', contact: 'cork' };
 const VIEW_TO_HASH = Object.fromEntries(Object.entries(HASH_TO_VIEW).map(([h, v]) => [v, h]));
 const setHash = (h) => history.replaceState(null, '', h ? `#${h}` : location.pathname + location.search);
