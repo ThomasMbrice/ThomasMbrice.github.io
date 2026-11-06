@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { buildOffice } from './scene.js';
+import { loadEnvironment } from './assets.js';
 import { SEASONS, TIMES, seasonForDate, timeForHour } from './outside.js';
 import { loadRepos, renderLaptop, renderResume, renderBook, renderContact } from './panels.js';
 
@@ -23,6 +24,7 @@ renderer.localClippingEnabled = true; // keeps snow/leaves inside the window gla
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(62, 1, 0.02, 40);
 const office = buildOffice(scene);
+loadEnvironment(renderer, scene);
 
 // ---------- Season / time of day ----------
 // 'auto' follows the visitor's date and clock; the picker lets you preview the others.
@@ -167,7 +169,7 @@ function pullBook(mesh) {
     returnBook();
     pulledBook = mesh;
     const to = mesh.userData.home.clone().add(new THREE.Vector3(0, 0.05, 0.3));
-    bookAnim.set(mesh, { to, toRot: new THREE.Euler(0, -1.1, 0) });
+    bookAnim.set(mesh, { to, toRot: new THREE.Euler(0, -1.1, mesh.userData.homeRot.z) }); // flat books stay flat
     hint.hidden = true;
     setHash(`books/${mesh.userData.index}`);
     openPanel('book', el => renderBook(el, mesh.userData.book));
@@ -194,7 +196,8 @@ let hoveredBook = null;
 function pick(ev) {
     pointer.set((ev.clientX / innerWidth) * 2 - 1, -(ev.clientY / innerHeight) * 2 + 1);
     raycaster.setFromCamera(pointer, camera);
-    return raycaster.intersectObjects(scene.children, true)[0]?.object ?? null;
+    const hit = raycaster.intersectObjects(scene.children, true).find(h => h.object.visible);
+    return hit?.object ?? null;
 }
 
 function setHover(id, ev) {

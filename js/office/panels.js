@@ -171,15 +171,15 @@ export function renderResume(el) {
 // ---------- Book ----------
 
 export function renderBook(el, book) {
-    const stars = '★'.repeat(book.rating || 0) + '☆'.repeat(5 - (book.rating || 0));
+    const stars = book.rating ? '★'.repeat(book.rating) + '☆'.repeat(5 - book.rating) : '';
     el.innerHTML = `
-      <article class="book-card" style="--spine:${esc(book.color)}">
-        <div class="book-cover"><span>${esc(book.title)}</span><small>${esc(book.author)}</small></div>
+      <article class="book-card" style="--spine:${esc(book.color)};--spine-ink:${esc(book.ink || '#f5ecd7')}">
+        <div class="book-cover"><span>${esc(book.short || book.title)}</span><small>${esc(book.author)}</small></div>
         <div class="book-notes">
           <h2>${esc(book.title)}</h2>
           <p class="book-author">${esc(book.author)}</p>
-          <p class="book-stars" aria-label="${book.rating} out of 5">${stars}</p>
-          <p>${esc(book.note)}</p>
+          ${stars ? `<p class="book-stars" aria-label="${book.rating} out of 5">${stars}</p>` : ''}
+          ${book.note ? `<p>${esc(book.note)}</p>` : ''}
         </div>
       </article>`;
 }

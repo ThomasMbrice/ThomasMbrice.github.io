@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { BOOKS, RESUME } from './data.js';
+import { BOOKS, CATEGORIES, RESUME } from './data.js';
 import { buildOutside, skyFor } from './outside.js';
+import { applyPBR, swapInModel } from './assets.js';
+import { buildFootball, buildHikingKit, buildSpursSticker } from './props.js';
 
 // Everything in the room is built from primitives — no model files to load.
 // Units are meters. The visitor sits at the desk facing the back wall (z = -2.5);
@@ -74,7 +76,9 @@ function wrapText(ctx, text, x, y, maxW, lineH) {
 function buildRoom(scene) {
     const floorTex = woodTexture('#7a543b', '#3b2416');
     floorTex.repeat.set(4, 4);
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), mat('#ffffff', { map: floorTex, roughness: 0.7 }));
+    const floorMat = mat('#ffffff', { map: floorTex, roughness: 0.7 });
+    applyPBR(floorMat, 'floor', [5, 5], '#e8d2bc');
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.set(0, 0, 0);
     floor.receiveShadow = true;
@@ -96,12 +100,15 @@ function buildRoom(scene) {
     scene.add(ceiling);
 
     const wallMat = mat('#e8dccb', { roughness: 0.95 });
+    applyPBR(wallMat, 'plaster', [4, 1.6], '#f6e7d2');
     const back = new THREE.Mesh(new THREE.PlaneGeometry(8, 3.2), wallMat);
     back.position.set(0, 1.6, -2.5);
     back.receiveShadow = true;
     scene.add(back);
 
-    const left = new THREE.Mesh(new THREE.PlaneGeometry(8, 3.2), mat('#ded0bd', { roughness: 0.95 }));
+    const leftMat = mat('#ded0bd', { roughness: 0.95 });
+    applyPBR(leftMat, 'plaster', [4, 1.6], '#eadcc6');
+    const left = new THREE.Mesh(new THREE.PlaneGeometry(8, 3.2), leftMat);
     left.rotation.y = Math.PI / 2;
     left.position.set(-3, 1.6, 1.5);
     left.receiveShadow = true;
@@ -155,7 +162,9 @@ function buildWindow(scene) {
 
 function buildDesk(scene) {
     const wood = woodTexture('#9a6b47', '#4a2c18');
-    const top = box(1.9, 0.05, 0.85, mat('#ffffff', { map: wood, roughness: 0.55 }), 0.01);
+    const topMat = mat('#ffffff', { map: wood, roughness: 0.55 });
+    applyPBR(topMat, 'walnut', [1.5, 1]);
+    const top = box(1.9, 0.05, 0.85, topMat, 0.01);
     top.position.set(0, DESK_Y - 0.025, DESK_Z);
     scene.add(top);
     const legMat = mat('#2b2b2b', { metalness: 0.6, roughness: 0.4 });
@@ -195,31 +204,60 @@ function buildLaptop(scene) {
     const g = new THREE.Group();
     g.position.set(-0.12, DESK_Y, DESK_Z - 0.17);
     g.scale.setScalar(1.25);
-    const shell = mat('#b9bec6', { metalness: 0.7, roughness: 0.35 });
+    // space grey aluminium, MacBook-style: black bezel with a notch, black keys, big trackpad
+    const shell = mat('#7b7d82', { metalness: 0.85, roughness: 0.32 });
+    const black = mat('#0c0c0e', { roughness: 0.6 });
 
-    const base = box(0.36, 0.016, 0.25, shell, 0.006);
-    base.position.y = 0.008;
+    const base = box(0.36, 0.014, 0.25, shell, 0.006);
+    base.position.y = 0.007;
     g.add(base);
-    const keys = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.11), mat('#2a2d33', { roughness: 0.9 }));
+    const keyTex = canvasTexture(1024, 380, (ctx, w, h) => {
+        ctx.fillStyle = '#5f6166';
+        ctx.fillRect(0, 0, w, h);
+        const rows = [14, 14, 13, 12, 11];
+        const kh = h / 6.2;
+        rows.forEach((n, r) => {
+            const kw = (w - 30) / n;
+            for (let i = 0; i < n; i++) {
+                ctx.fillStyle = '#111214';
+                ctx.fillRect(15 + i * kw + 3, 12 + r * (kh + 6), kw - 6, kh);
+            }
+        });
+        ctx.fillStyle = '#111214'; // space bar row
+        const y = 12 + 5 * (kh + 6);
+        ctx.fillRect(w * 0.3, y, w * 0.4, kh * 0.9);
+        ctx.fillRect(18, y, w * 0.26, kh * 0.9);
+        ctx.fillRect(w * 0.72, y, w * 0.26, kh * 0.9);
+    }).tex;
+    const keys = new THREE.Mesh(new THREE.PlaneGeometry(0.31, 0.115), mat('#ffffff', { map: keyTex, roughness: 0.7 }));
     keys.rotation.x = -Math.PI / 2;
-    keys.position.set(0, 0.0165, -0.03);
+    keys.position.set(0, 0.0145, -0.04);
     g.add(keys);
-    const pad = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.07), mat('#a5aab2', { roughness: 0.5 }));
+    const pad = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.09), mat('#6c6e73', { metalness: 0.5, roughness: 0.25 }));
     pad.rotation.x = -Math.PI / 2;
-    pad.position.set(0, 0.0165, 0.075);
+    pad.position.set(0, 0.0145, 0.07);
     g.add(pad);
 
     const lid = new THREE.Group();
-    lid.position.set(0, 0.016, -0.125);
+    lid.position.set(0, 0.014, -0.125);
     lid.rotation.x = -0.28;
-    const lidBody = box(0.36, 0.235, 0.01, shell, 0.004);
+    const lidBody = box(0.36, 0.235, 0.008, shell, 0.004);
     lidBody.position.y = 0.1175;
     lid.add(lidBody);
+    const hinge = box(0.3, 0.012, 0.012, black, 0.005);
+    hinge.position.y = 0.002;
+    lid.add(hinge);
+    const bezel = new THREE.Mesh(new THREE.PlaneGeometry(0.352, 0.227), black);
+    bezel.position.set(0, 0.1175, 0.0042);
+    lid.add(bezel);
 
     const screen = canvasTexture(1024, 640, () => {});
-    const screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.33, 0.206), new THREE.MeshBasicMaterial({ map: screen.tex }));
-    screenMesh.position.set(0, 0.1175, 0.0056);
+    const screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.336, 0.21), new THREE.MeshBasicMaterial({ map: screen.tex }));
+    screenMesh.position.set(0, 0.1175, 0.0046);
     lid.add(screenMesh);
+    const notch = new THREE.Mesh(new THREE.PlaneGeometry(0.04, 0.008), black);
+    notch.position.set(0, 0.2185, 0.005);
+    lid.add(notch);
     g.add(lid);
 
     // soft glow from the display onto the desk
@@ -432,6 +470,8 @@ function buildLamp(scene) {
     scene.add(g);
     return {
         group: g,
+        light,
+        bulb,
         toggle() {
             light.visible = !light.visible;
             bulb.material.color.set(light.visible ? '#fff2c6' : '#555');
@@ -494,7 +534,7 @@ function buildMug(scene) {
 
 function buildPlant(scene) {
     const g = new THREE.Group();
-    g.position.set(1.5, 0, -2.15);
+    g.position.set(-1.6, 2.105, -2.3); // on top of the bookshelf
     g.scale.setScalar(1.2);
     const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.12, 0.32, 24), mat('#c06b46', { roughness: 0.9 }));
     pot.position.y = 0.16;
@@ -513,6 +553,7 @@ function buildPlant(scene) {
     }
     scene.add(g);
     return {
+        group: g,
         update(t) { g.rotation.z = Math.sin(t * 0.6) * 0.01; },
     };
 }
@@ -530,7 +571,7 @@ function spineTexture(book, w, h) {
         ctx.save();
         ctx.translate(cw / 2, ch / 2);
         ctx.rotate(Math.PI / 2);
-        ctx.fillStyle = '#f5ecd7';
+        ctx.fillStyle = book.ink || '#f5ecd7';
         const label = book.short || book.title;
         let size = 54;
         ctx.font = `bold ${size}px Georgia, serif`;
@@ -551,9 +592,12 @@ function buildBookshelf(scene) {
     g.scale.setScalar(1.08);
     const wood = woodTexture('#6e4a32', '#2e1b10');
     const m = mat('#ffffff', { map: wood, roughness: 0.75 });
+    applyPBR(m, 'walnut', [1, 1], '#d9b99c');
     const W = 1.1, H = 1.95, D = 0.32, T = 0.03;
 
-    const backPanel = box(W, H, 0.015, mat('#5a3b27', { roughness: 0.9 }));
+    const backMat = mat('#5a3b27', { roughness: 0.9 });
+    applyPBR(backMat, 'darkwood', [1, 2]);
+    const backPanel = box(W, H, 0.015, backMat);
     backPanel.position.set(0, H / 2, -D / 2 + 0.008);
     g.add(backPanel);
     for (const x of [-W / 2 + T / 2, W / 2 - T / 2]) {
@@ -568,59 +612,95 @@ function buildBookshelf(scene) {
         g.add(s);
     }
 
-    // lay books onto the three upper usable shelves, left to right
+    // books go onto the three upper shelves, grouped by category: upright groups sorted
+    // tallest-first with spines flush to the front, small sets laid flat as stacks
     const books = [];
     const rows = [shelfYs[3], shelfYs[2], shelfYs[1]];
-    // spread books evenly across the rows, leaving room for a bookend/plant on each
-    const perRow = Math.ceil(BOOKS.length / rows.length);
-    const rowStart = [-W / 2 + T + 0.03, -W / 2 + T + 0.28, -W / 2 + T + 0.06];
-    let row = -1;
-    let x = 0;
-    BOOKS.forEach((book, i) => {
-        const thick = 0.035 + ((i * 37) % 5) * 0.007;
-        const height = 0.24 + ((i * 53) % 4) * 0.025;
-        const depth = 0.2 + ((i * 17) % 3) * 0.02;
-        if (i % perRow === 0) {
-            row++;
-            x = rowStart[row % rowStart.length];
-        }
-        if (row >= rows.length || x + thick > W / 2 - T - 0.03) return;
+    const rowX = rows.map(() => -W / 2 + T + 0.02);
+    const sizeOf = (book, i) => ({
+        thick: book.thick ?? 0.035 + ((i * 37) % 4) * 0.006,
+        height: 0.24 + ((i * 53) % 4) * 0.022,
+        depth: 0.2 + ((i * 17) % 3) * 0.02,
+    });
+    const makeBook = (book, i, size) => {
         const coverMat = mat(book.color, { roughness: 0.6 });
         const pagesMat = mat('#efe6d2', { roughness: 0.95 });
         const spineMat = mat('#ffffff', { map: spineTexture(book), roughness: 0.6 });
         // box face order: +x, -x, +y, -y, +z (spine, facing out), -z
-        const mesh = new THREE.Mesh(new THREE.BoxGeometry(thick, height, depth), [coverMat, coverMat, pagesMat, pagesMat, spineMat, pagesMat]);
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(size.thick, size.height, size.depth), [coverMat, coverMat, pagesMat, pagesMat, spineMat, pagesMat]);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        const lean = (i % 7 === 6) ? 0.12 : 0;
-        mesh.position.set(x + thick / 2, rows[row] + T / 2 + height / 2, -D / 2 + depth / 2 + 0.03);
-        mesh.rotation.z = lean;
-        mesh.userData = { book, index: i, home: mesh.position.clone(), homeRot: mesh.rotation.clone() };
+        mesh.userData = { book, index: i };
         g.add(mesh);
         books.push(mesh);
-        x += thick + 0.003 + (lean ? 0.03 : 0);
+        return mesh;
+    };
+    const settle = (mesh) => {
+        mesh.userData.home = mesh.position.clone();
+        mesh.userData.homeRot = mesh.rotation.clone();
+    };
+    const bookendMat = mat('#2b2b2e', { metalness: 0.7, roughness: 0.4 });
+    const bookend = (x, r) => {
+        const plate = box(0.012, 0.16, 0.12, bookendMat);
+        plate.position.set(x + 0.006, rows[r] + T / 2 + 0.08, D / 2 - 0.09);
+        g.add(plate);
+        const foot = box(0.07, 0.006, 0.12, bookendMat);
+        foot.position.set(x + 0.035, rows[r] + T / 2 + 0.003, D / 2 - 0.09);
+        g.add(foot);
+    };
+    const front = D / 2 - 0.015; // spines line up here
+
+    CATEGORIES.forEach((cat, ci) => {
+        const r = cat.row;
+        const group = BOOKS.map((book, i) => ({ book, i, size: sizeOf(book, i) })).filter(b => b.book.category === cat.id);
+        if (cat.layout === 'stack') {
+            // lying flat, largest on the bottom
+            group.sort((a, b) => b.size.height - a.size.height);
+            const widest = group[0].size.height;
+            let y = rows[r] + T / 2;
+            group.forEach(({ book, i, size }, k) => {
+                const mesh = makeBook(book, i, size);
+                mesh.rotation.z = Math.PI / 2;
+                mesh.rotation.y = (k % 2 ? 0.04 : -0.03);
+                mesh.position.set(rowX[r] + widest / 2, y + size.thick / 2, front - size.depth / 2);
+                y += size.thick;
+                settle(mesh);
+            });
+            rowX[r] += widest + 0.03;
+            return;
+        }
+        group.sort((a, b) => b.size.height - a.size.height);
+        for (const { book, i, size } of group) {
+            const mesh = makeBook(book, i, size);
+            mesh.position.set(rowX[r] + size.thick / 2, rows[r] + T / 2 + size.height / 2, front - size.depth / 2);
+            settle(mesh);
+            rowX[r] += size.thick + 0.002;
+        }
+        const next = CATEGORIES[ci + 1];
+        if (!next || next.row !== r) {
+            bookend(rowX[r], r);
+            rowX[r] += 0.012;
+        }
+        rowX[r] += 0.045;
     });
 
-    // fill the gaps: a succulent, a lying stack, a little frame
+    // fill the gaps: a succulent and a little frame
     const rowY = (r) => rows[r] + T / 2;
+    const succulent = new THREE.Group();
+    succulent.position.set(W / 2 - 0.14, rowY(0), 0);
+    g.add(succulent);
     const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.04, 0.08, 16), mat('#e9e2d6', { roughness: 0.6 }));
-    pot.position.set(W / 2 - 0.14, rowY(0) + 0.04, 0);
+    pot.position.set(0, 0.04, 0);
     pot.castShadow = true;
-    g.add(pot);
+    succulent.add(pot);
     for (let i = 0; i < 7; i++) {
         const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), mat('#6a9e6f', { roughness: 0.6 }));
         const a = (i / 7) * Math.PI * 2;
         leaf.scale.set(0.6, 1.4, 0.6);
-        leaf.position.set(W / 2 - 0.14 + Math.cos(a) * 0.025, rowY(0) + 0.11, Math.sin(a) * 0.025);
+        leaf.position.set(Math.cos(a) * 0.025, 0.11, Math.sin(a) * 0.025);
         leaf.rotation.set(Math.sin(a) * 0.5, 0, -Math.cos(a) * 0.5);
-        g.add(leaf);
+        succulent.add(leaf);
     }
-    ['#3a5a40', '#9c6644', '#264653'].forEach((c, i) => {
-        const b = box(0.2 - i * 0.015, 0.035, 0.16, mat(c, { roughness: 0.6 }));
-        b.position.set(-W / 2 + T + 0.13, rowY(1) + 0.0175 + i * 0.035, 0.01);
-        b.rotation.y = (i - 1) * 0.08;
-        g.add(b);
-    });
     const frame = box(0.14, 0.18, 0.015, mat('#2b2b2b'));
     frame.position.set(W / 2 - 0.15, rowY(2) + 0.09, -0.04);
     frame.rotation.x = -0.12;
@@ -647,7 +727,7 @@ function buildBookshelf(scene) {
     g.add(shelfLight);
 
     scene.add(g);
-    return { group: g, books, globe };
+    return { group: g, books, globe, succulent };
 }
 
 // ---------- Corkboard (contact) ----------
@@ -722,6 +802,8 @@ function buildLights(scene) {
         sun.intensity = 0.4 + sky.sun * 1.6;
         sun.color.set(sky.night ? '#9fb4ff' : season === 'winter' ? '#e4ecff' : sky.label === 'day' ? '#ffe9c8' : '#ffc890');
         fill.intensity = 0.9 + sky.ambient;
+        // the HDRI is a daytime room, so dim its contribution after dark
+        scene.environmentIntensity = sky.night ? 0.06 : sky.label === 'day' ? 0.45 : 0.25;
     };
 }
 
@@ -733,6 +815,10 @@ export function buildOffice(scene) {
     const outside = buildWindow(scene);
     const applyLights = buildLights(scene);
     buildDesk(scene);
+
+    buildFootball(scene, [-1.92, 0, -1.95]);
+    buildHikingKit(scene, [1.98, 0, -2.22]);
+    buildSpursSticker(scene, [-0.42, DESK_Y + 0.0012, DESK_Z + 0.27], 0.25);
 
     const office = {
         laptop: buildLaptop(scene),
@@ -751,5 +837,24 @@ export function buildOffice(scene) {
             return sky;
         },
     };
+    loadModels(office);
     return office;
 }
+
+// Poly Haven models replace the procedural stand-ins as they arrive.
+function loadModels(office) {
+    const { lamp, plant, shelf } = office;
+    swapInModel(lamp.group, 'desk_lamp_arm_01.glb', { fit: 0.45, rotationY: LAMP_MODEL.rotationY, keep: [lamp.light, lamp.light.target] })
+        .then(model => {
+            if (!model) return;
+            model.updateMatrix();
+            lamp.light.position.copy(LAMP_MODEL.bulb).applyMatrix4(model.matrix);
+            lamp.light.target.position.set(-0.32, 0, 0.38); // the resume
+        });
+    swapInModel(plant.group, 'potted_plant_02.glb', { fit: 0.42 });
+    swapInModel(shelf.succulent, 'potted_plant_04.glb', { fit: 0.2 });
+}
+
+// The Poly Haven lamp's bulb sits at -z in model space; turn it to face the resume
+// and put the spotlight just under the bulb.
+const LAMP_MODEL = { rotationY: 2.44, bulb: new THREE.Vector3(0, 0.64, -0.175) };

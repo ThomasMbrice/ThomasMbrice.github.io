@@ -2,33 +2,51 @@
 
 export const GITHUB_USER = 'ThomasMbrice';
 
-// Bookshelf — PLACEHOLDERS: swap these for books you've actually read.
-// color = spine color, note = your one-paragraph take, rating = 1..5
+// Bookshelf, grouped by category (the categories are never shown, they only drive
+// the arrangement). Groups fill each shelf row (0 = top) left to right in this order.
+// layout: 'upright' (sorted tallest first) or 'stack' (lying flat, for small sets).
+export const CATEGORIES = [
+    { id: 'philosophy', row: 0, layout: 'stack' },
+    { id: 'cs', row: 0, layout: 'upright' },
+    { id: 'business', row: 1, layout: 'upright' },
+    { id: 'strategy', row: 1, layout: 'upright' },
+    { id: 'fiction', row: 2, layout: 'upright' },
+    { id: 'latin', row: 2, layout: 'stack' },
+];
+
+// color = spine color, ink = spine text color, short = spine label for long titles,
+// thick = spine width in meters (optional). rating (1-5) and note are optional;
+// the book card hides them when empty.
 export const BOOKS = [
-    { title: 'Gödel, Escher, Bach', author: 'Douglas Hofstadter', color: '#7a2e2e', rating: 5,
-      note: 'Placeholder — write what this book changed about how you think.' },
-    { title: 'The Structure and Interpretation of Computer Programs', short: 'SICP', author: 'Abelson & Sussman', color: '#3d2f6b', rating: 5,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'Deep Learning', author: 'Goodfellow, Bengio & Courville', color: '#1f3b4d', rating: 4,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'Reinforcement Learning: An Introduction', short: 'RL: An Introduction', author: 'Sutton & Barto', color: '#2f5d50', rating: 5,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'Quantum Computation and Quantum Information', short: 'Mike & Ike', author: 'Nielsen & Chuang', color: '#8a6d1f', rating: 4,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'Designing Data-Intensive Applications', short: 'DDIA', author: 'Martin Kleppmann', color: '#a8452b', rating: 5,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'The Art of Computer Programming', short: 'TAOCP Vol. 1', author: 'Donald Knuth', color: '#23395b', rating: 4,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'Probability Theory: The Logic of Science', short: 'Probability Theory', author: 'E. T. Jaynes', color: '#4a4a4a', rating: 4,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'Thinking, Fast and Slow', author: 'Daniel Kahneman', color: '#c9a227', rating: 4,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'The Pragmatic Programmer', author: 'Hunt & Thomas', color: '#5c3d2e', rating: 4,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'Dune', author: 'Frank Herbert', color: '#b5651d', rating: 5,
-      note: 'Placeholder — your take goes here.' },
-    { title: 'Elements of Statistical Learning', short: 'ESL', author: 'Hastie, Tibshirani & Friedman', color: '#2b4c7e', rating: 4,
-      note: 'Placeholder — your take goes here.' },
+    // Computer Science
+    { category: 'cs', title: 'Designing Machine Learning Systems', short: 'Designing ML Systems', author: 'Chip Huyen', color: '#7a2e5a', rating: 0, note: '' },
+    { category: 'cs', title: 'Cracking the Coding Interview', author: 'Gayle Laakmann McDowell', color: '#2f6e9c', thick: 0.06, rating: 0, note: '' },
+    { category: 'cs', title: 'Writing a C Compiler', author: 'Nora Sandler', color: '#c4512b', rating: 0, note: '' },
+    // Philosophy
+    { category: 'philosophy', title: 'The Myth of Sisyphus', author: 'Albert Camus', color: '#3d5a40', rating: 0, note: '' },
+    { category: 'philosophy', title: 'Fear and Trembling', author: 'Søren Kierkegaard', color: '#4a4a4a', rating: 0, note: '' },
+    // Business & Leadership
+    { category: 'business', title: 'The Future of Management', author: 'Gary Hamel', color: '#1f3b5c', rating: 0, note: '' },
+    { category: 'business', title: 'Play Nice But Win', author: 'Michael Dell', color: '#16325c', rating: 0, note: '' },
+    { category: 'business', title: 'Steve Jobs', author: 'Walter Isaacson', color: '#e8e4dc', ink: '#1a1a1a', thick: 0.058, rating: 0, note: '' },
+    { category: 'business', title: 'Purpose', author: 'Nikos Mourkogiannis', color: '#8a6d1f', rating: 0, note: '' },
+    { category: 'business', title: 'The Leadership Challenge', author: 'James Kouzes & Barry Posner', color: '#b23a2e', rating: 0, note: '' },
+    { category: 'business', title: 'Emotional Intelligence 2.0', author: 'Travis Bradberry & Jean Greaves', color: '#2b7a8c', thick: 0.032, rating: 0, note: '' },
+    // Economics & Strategy
+    { category: 'strategy', title: 'Why Nations Fail', author: 'Daron Acemoglu & James A. Robinson', color: '#d9b23a', ink: '#1a1a1a', rating: 0, note: '' },
+    { category: 'strategy', title: 'One Up On Wall Street', author: 'Peter Lynch', color: '#2f5d3a', rating: 0, note: '' },
+    { category: 'strategy', title: 'The Art of Strategy', author: 'Avinash Dixit & Barry Nalebuff', color: '#3b3f8c', rating: 0, note: '' },
+    { category: 'strategy', title: 'The 48 Laws of Power', author: 'Robert Greene', color: '#1c1c1c', ink: '#c9a227', thick: 0.055, rating: 0, note: '' },
+    // Fiction
+    { category: 'fiction', title: 'War and Peace', author: 'Leo Tolstoy', color: '#6b2430', thick: 0.085, rating: 0, note: '' },
+    { category: 'fiction', title: 'Crime and Punishment', author: 'Fyodor Dostoevsky', color: '#2b2b2b', thick: 0.055, rating: 0, note: '' },
+    { category: 'fiction', title: 'The Hunchback of Notre-Dame', short: 'Hunchback of Notre-Dame', author: 'Victor Hugo', color: '#5c2a2a', thick: 0.055, rating: 0, note: '' },
+    { category: 'fiction', title: 'The Catcher in the Rye', author: 'J. D. Salinger', color: '#9c3b2e', rating: 0, note: '' },
+    { category: 'fiction', title: 'A Farewell to Arms', author: 'Ernest Hemingway', color: '#2e4a6b', rating: 0, note: '' },
+    { category: 'fiction', title: 'Slaughterhouse-Five', author: 'Kurt Vonnegut', color: '#e0662d', ink: '#1a1a1a', thick: 0.032, rating: 0, note: '' },
+    // Latin
+    { category: 'latin', title: 'Lingua Latina per se Illustrata, Pars I: Familia Romana', short: 'Familia Romana', author: 'Hans H. Ørberg', color: '#8c2f2f', thick: 0.045, rating: 0, note: '' },
+    { category: 'latin', title: 'Lingua Latina per se Illustrata, Pars II: Roma Aeterna', short: 'Roma Aeterna', author: 'Hans H. Ørberg', color: '#2f4f8c', thick: 0.05, rating: 0, note: '' },
 ];
 
 export const RESUME = {
