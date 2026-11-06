@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thomas Mbrice — Office</title>
+    <meta name="description" content="Step into Thomas Mbrice's office — browse the bookshelf, open the laptop to see projects, and read the resume on the desk.">
+    <meta name="author" content="Thomas Mbrice">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Thomas Mbrice — Office">
+    <meta property="og:description" content="An interactive 3D office: projects, books, and resume.">
+    <link rel="stylesheet" href="public/office.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <canvas id="office" aria-label="3D office scene"></canvas>
+
+    <header class="topbar">
+        <a class="name" href="office.html">Thomas <span>Mbrice</span></a>
+        <p class="status">ML research &amp; engineering · <span id="time-of-day"></span> at the office</p>
+        <a class="classic" href="index.html">classic site →</a>
+    </header>
+
+    <div id="loading">walking to the office…</div>
+    <div id="hover-tag" class="hover-tag" hidden></div>
+    <p id="hint" class="hint">Click around the office</p>
+    <button id="back" class="back" hidden>← step back</button>
+
+    <div id="panel" class="panel" hidden>
+        <button id="panel-close" class="panel-close" aria-label="Close">×</button>
+        <div id="panel-body"></div>
+    </div>
+
+    <nav id="dock" class="dock" aria-label="Office">
+        <button data-go="overview" class="active">Room</button>
+        <button data-go="laptop">Laptop</button>
+        <button data-go="paper">Resume</button>
+        <button data-go="shelf">Books</button>
+        <button data-go="cork">Contact</button>
+    </nav>
+
+    <noscript>This page needs JavaScript. <a href="index.html">Try the classic site.</a></noscript>
+    <script type="module" src="js/office/main.js"></script>
+</body>
+</html>
