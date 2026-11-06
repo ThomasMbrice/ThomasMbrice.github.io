@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { BOOKS, RESUME } from './data.js';
+import { buildOutside, skyFor } from './outside.js';
 
 // Everything in the room is built from primitives — no model files to load.
-// Units are meters. The desk sits against the back wall (z = -2.5).
+// Units are meters. The visitor sits at the desk facing the back wall (z = -2.5);
+// the desk floats out in the room with a gap before the wall.
 
 const DESK_Y = 0.76;
+const DESK_Z = -1.35;
 
 const mat = (color, opts = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.8, ...opts });
 
@@ -66,55 +69,6 @@ function wrapText(ctx, text, x, y, maxW, lineH) {
     return y + lineH;
 }
 
-// ---------- Window sky, driven by the visitor's local clock ----------
-
-export function skyForHour(h) {
-    if (h >= 21 || h < 5) return { top: '#060a1f', bottom: '#1b2550', stars: true, sun: 0.0, ambient: 0.18, label: 'night' };
-    if (h < 7) return { top: '#3b4a7a', bottom: '#f6a57a', stars: false, sun: 0.5, ambient: 0.35, label: 'sunrise' };
-    if (h < 17) return { top: '#5aa9e6', bottom: '#d8ecff', stars: false, sun: 1.0, ambient: 0.55, label: 'day' };
-    if (h < 19) return { top: '#4b3f7a', bottom: '#ff8a5c', stars: false, sun: 0.55, ambient: 0.35, label: 'golden hour' };
-    return { top: '#141a3d', bottom: '#5b4b8a', stars: true, sun: 0.15, ambient: 0.25, label: 'dusk' };
-}
-
-function skyTexture(sky) {
-    return canvasTexture(512, 512, (ctx, w, h) => {
-        const g = ctx.createLinearGradient(0, 0, 0, h);
-        g.addColorStop(0, sky.top);
-        g.addColorStop(1, sky.bottom);
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, w, h);
-        if (sky.stars) {
-            for (let i = 0; i < 140; i++) {
-                ctx.fillStyle = `rgba(255,255,255,${0.3 + Math.random() * 0.7})`;
-                const r = Math.random() * 1.6;
-                ctx.beginPath();
-                ctx.arc(Math.random() * w, Math.random() * h * 0.75, r, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.fillStyle = '#f4f1e1';
-            ctx.beginPath();
-            ctx.arc(w * 0.75, h * 0.22, 26, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        // skyline silhouette
-        ctx.fillStyle = sky.stars ? '#05070f' : 'rgba(40,50,70,0.55)';
-        let x = 0;
-        while (x < w) {
-            const bw = 30 + Math.random() * 50;
-            const bh = 60 + Math.random() * 140;
-            ctx.fillRect(x, h - bh, bw - 4, bh);
-            if (sky.stars) {
-                ctx.fillStyle = '#f7c56a';
-                for (let wy = h - bh + 10; wy < h - 10; wy += 16)
-                    for (let wx = x + 6; wx < x + bw - 12; wx += 12)
-                        if (Math.random() < 0.25) ctx.fillRect(wx, wy, 5, 7);
-                ctx.fillStyle = '#05070f';
-            }
-            x += bw;
-        }
-    }).tex;
-}
-
 // ---------- Room ----------
 
 function buildRoom(scene) {
@@ -128,12 +82,12 @@ function buildRoom(scene) {
 
     const rug = new THREE.Mesh(new THREE.CircleGeometry(1.3, 48), mat('#b8553a', { roughness: 1 }));
     rug.rotation.x = -Math.PI / 2;
-    rug.position.set(0.1, 0.004, -0.9);
+    rug.position.set(0, 0.004, -0.9);
     rug.receiveShadow = true;
     scene.add(rug);
     const rugInner = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.08, 48), mat('#e8c49a', { roughness: 1 }));
     rugInner.rotation.x = -Math.PI / 2;
-    rugInner.position.set(0.1, 0.005, -0.9);
+    rugInner.position.set(0, 0.005, -0.9);
     scene.add(rugInner);
 
     const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), mat('#f1e9dd', { roughness: 1 }));
@@ -163,28 +117,38 @@ function buildRoom(scene) {
     scene.add(bb2);
 }
 
-function buildWindow(scene, sky) {
+// A big loft window looking out at Manhattan. Particles are clipped to the glass.
+const WIN = { w: 1.8, h: 1.3, y: 1.66 };
+
+function buildWindow(scene) {
     const g = new THREE.Group();
-    g.position.set(0, 1.78, -2.49);
-    const glass = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.95), new THREE.MeshBasicMaterial({ map: skyTexture(sky) }));
-    glass.position.z = 0.005;
-    g.add(glass);
-    const frameMat = mat('#f4ede3', { roughness: 0.6 });
+    g.position.set(0, WIN.y, -2.49);
+    const clip = [
+        new THREE.Plane(new THREE.Vector3(1, 0, 0), WIN.w / 2),
+        new THREE.Plane(new THREE.Vector3(-1, 0, 0), WIN.w / 2),
+        new THREE.Plane(new THREE.Vector3(0, 1, 0), -(WIN.y - WIN.h / 2)),
+        new THREE.Plane(new THREE.Vector3(0, -1, 0), WIN.y + WIN.h / 2),
+    ];
+    const outside = buildOutside(g, WIN.w, WIN.h, clip);
+
+    const frameMat = mat('#2b2b2e', { roughness: 0.5, metalness: 0.4 }); // black steel loft frame
+    const F = 0.06;
     const pieces = [
-        [1.42, 0.06, 0, 0.505], [1.42, 0.06, 0, -0.505],
-        [0.06, 1.07, -0.68, 0], [0.06, 1.07, 0.68, 0],
-        [0.03, 0.95, 0, 0], [1.3, 0.03, 0, 0],
+        [WIN.w + F * 2, F, 0, WIN.h / 2 + F / 2], [WIN.w + F * 2, F, 0, -WIN.h / 2 - F / 2],
+        [F, WIN.h, -WIN.w / 2 - F / 2, 0], [F, WIN.h, WIN.w / 2 + F / 2, 0],
+        [0.03, WIN.h, -WIN.w / 6, 0], [0.03, WIN.h, WIN.w / 6, 0],
+        [WIN.w, 0.025, 0, WIN.h * 0.22],
     ];
     for (const [w, h, x, y] of pieces) {
         const p = box(w, h, 0.05, frameMat);
         p.position.set(x, y, 0.025);
         g.add(p);
     }
-    const sill = box(1.55, 0.04, 0.16, frameMat);
-    sill.position.set(0, -0.53, 0.07);
+    const sill = box(WIN.w + 0.16, 0.04, 0.18, mat('#f4ede3', { roughness: 0.6 }));
+    sill.position.set(0, -WIN.h / 2 - F - 0.02, 0.08);
     g.add(sill);
     scene.add(g);
-    return g;
+    return outside;
 }
 
 // ---------- Desk + chair ----------
@@ -192,10 +156,10 @@ function buildWindow(scene, sky) {
 function buildDesk(scene) {
     const wood = woodTexture('#9a6b47', '#4a2c18');
     const top = box(1.9, 0.05, 0.85, mat('#ffffff', { map: wood, roughness: 0.55 }), 0.01);
-    top.position.set(0, DESK_Y - 0.025, -2.0);
+    top.position.set(0, DESK_Y - 0.025, DESK_Z);
     scene.add(top);
     const legMat = mat('#2b2b2b', { metalness: 0.6, roughness: 0.4 });
-    for (const [x, z] of [[-0.9, -2.35], [0.9, -2.35], [-0.9, -1.65], [0.9, -1.65]]) {
+    for (const [x, z] of [[-0.9, DESK_Z - 0.35], [0.9, DESK_Z - 0.35], [-0.9, DESK_Z + 0.35], [0.9, DESK_Z + 0.35]]) {
         const leg = box(0.04, DESK_Y - 0.05, 0.04, legMat);
         leg.position.set(x, (DESK_Y - 0.05) / 2, z);
         scene.add(leg);
@@ -203,8 +167,7 @@ function buildDesk(scene) {
 
     // chair
     const chair = new THREE.Group();
-    chair.position.set(-0.45, 0, -1.3);
-    chair.rotation.y = 0.6;
+    chair.position.set(0, 0, -0.1); // the visitor's seat, just under the camera
     const seatMat = mat('#2f3a45', { roughness: 0.9 });
     const seat = box(0.48, 0.07, 0.46, seatMat, 0.03);
     seat.position.y = 0.48;
@@ -230,8 +193,8 @@ function buildDesk(scene) {
 
 function buildLaptop(scene) {
     const g = new THREE.Group();
-    g.position.set(-0.2, DESK_Y, -2.0);
-    g.rotation.y = 0.12;
+    g.position.set(-0.12, DESK_Y, DESK_Z - 0.17);
+    g.scale.setScalar(1.25);
     const shell = mat('#b9bec6', { metalness: 0.7, roughness: 0.35 });
 
     const base = box(0.36, 0.016, 0.25, shell, 0.006);
@@ -381,8 +344,9 @@ function drawResumePage(ctx, w, h) {
 
 function buildPaper(scene) {
     const g = new THREE.Group();
-    g.position.set(0.42, DESK_Y + 0.002, -1.85);
-    g.rotation.y = -0.22;
+    g.position.set(0.36, DESK_Y + 0.002, DESK_Z + 0.23);
+    g.scale.setScalar(1.15);
+    g.rotation.y = -0.18;
     const { tex } = canvasTexture(1024, 1325, drawResumePage);
 
     // a second sheet underneath, slightly offset, for depth
@@ -415,7 +379,8 @@ function buildPaper(scene) {
 
 function buildLamp(scene) {
     const g = new THREE.Group();
-    g.position.set(0.78, DESK_Y, -2.22);
+    g.position.set(0.74, DESK_Y, DESK_Z - 0.22);
+    g.scale.setScalar(1.2);
     const m = mat('#d97706', { roughness: 0.4, metalness: 0.3 });
     const base = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.02, 32), m);
     base.position.y = 0.01;
@@ -461,7 +426,7 @@ function buildLamp(scene) {
     light.shadow.mapSize.set(1024, 1024);
     light.shadow.bias = -0.0005;
     g.add(light);
-    light.target.position.set(-0.4, 0, 0.35); // the resume on the desk
+    light.target.position.set(-0.36, 0, 0.48); // the resume on the desk
     g.add(light.target);
 
     scene.add(g);
@@ -477,7 +442,8 @@ function buildLamp(scene) {
 
 function buildMug(scene) {
     const g = new THREE.Group();
-    g.position.set(0.18, DESK_Y, -2.22);
+    g.position.set(-0.62, DESK_Y, DESK_Z + 0.15);
+    g.scale.setScalar(1.2);
     const m = mat('#f3efe7', { roughness: 0.4 });
     const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.035, 0.1, 24, 1, true), m);
     cup.position.y = 0.05;
@@ -528,7 +494,8 @@ function buildMug(scene) {
 
 function buildPlant(scene) {
     const g = new THREE.Group();
-    g.position.set(1.55, 0, -2.15);
+    g.position.set(1.5, 0, -2.15);
+    g.scale.setScalar(1.2);
     const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.12, 0.32, 24), mat('#c06b46', { roughness: 0.9 }));
     pot.position.y = 0.16;
     pot.castShadow = true;
@@ -580,7 +547,8 @@ function spineTexture(book, w, h) {
 
 function buildBookshelf(scene) {
     const g = new THREE.Group();
-    g.position.set(-1.95, 0, -2.32);
+    g.position.set(-1.68, 0, -2.3);
+    g.scale.setScalar(1.08);
     const wood = woodTexture('#6e4a32', '#2e1b10');
     const m = mat('#ffffff', { map: wood, roughness: 0.75 });
     const W = 1.1, H = 1.95, D = 0.32, T = 0.03;
@@ -686,7 +654,8 @@ function buildBookshelf(scene) {
 
 function buildCorkboard(scene) {
     const g = new THREE.Group();
-    g.position.set(1.45, 1.55, -2.48);
+    g.position.set(1.72, 1.5, -2.47);
+    g.scale.setScalar(1.4);
     const frame = box(0.72, 0.52, 0.03, mat('#6e4a32'));
     g.add(frame);
     const corkTex = canvasTexture(256, 256, (ctx, w, h) => {
@@ -728,11 +697,12 @@ function buildCorkboard(scene) {
 
 // ---------- Lighting ----------
 
-function buildLights(scene, sky) {
-    scene.add(new THREE.HemisphereLight('#fff4e6', '#4a3428', sky.ambient + 0.15));
-    const sun = new THREE.DirectionalLight(sky.stars ? '#9fb4ff' : '#ffe2b8', 0.4 + sky.sun * 1.6);
-    sun.position.set(0.5, 2.6, -1.4); // falls through the window onto the desk
-    sun.target.position.set(0, 0, -0.5);
+function buildLights(scene) {
+    const hemi = new THREE.HemisphereLight('#fff4e6', '#4a3428', 0.5);
+    scene.add(hemi);
+    const sun = new THREE.DirectionalLight('#ffe2b8', 1);
+    sun.position.set(0.3, 2.7, -2.1); // falls through the window onto the desk
+    sun.target.position.set(0, 0.7, -1.0);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
     sun.shadow.camera.left = -3;
@@ -743,23 +713,28 @@ function buildLights(scene, sky) {
     scene.add(sun, sun.target);
 
     // warm fill from the "room" side so the front of objects isn't black
-    const fill = new THREE.PointLight('#ffd7a8', 0.9 + sky.ambient, 9, 1.6);
+    const fill = new THREE.PointLight('#ffd7a8', 1, 9, 1.6);
     fill.position.set(1.5, 2.4, 1.5);
     scene.add(fill);
+
+    return (sky, season) => {
+        hemi.intensity = sky.ambient + 0.15;
+        sun.intensity = 0.4 + sky.sun * 1.6;
+        sun.color.set(sky.night ? '#9fb4ff' : season === 'winter' ? '#e4ecff' : sky.label === 'day' ? '#ffe9c8' : '#ffc890');
+        fill.intensity = 0.9 + sky.ambient;
+    };
 }
 
 export function buildOffice(scene) {
-    const sky = skyForHour(new Date().getHours());
     scene.background = new THREE.Color('#1a1410');
     scene.fog = new THREE.Fog('#1a1410', 6, 14);
 
     buildRoom(scene);
-    buildWindow(scene, sky);
-    buildLights(scene, sky);
+    const outside = buildWindow(scene);
+    const applyLights = buildLights(scene);
     buildDesk(scene);
 
-    return {
-        sky,
+    const office = {
         laptop: buildLaptop(scene),
         paper: buildPaper(scene),
         lamp: buildLamp(scene),
@@ -767,5 +742,14 @@ export function buildOffice(scene) {
         plant: buildPlant(scene),
         shelf: buildBookshelf(scene),
         cork: buildCorkboard(scene),
+        outside,
+        // season: spring|summer|fall|winter, time: sunrise|day|golden hour|night
+        setConditions(season, time) {
+            const sky = skyFor(time);
+            outside.set(season, sky);
+            applyLights(sky, season);
+            return sky;
+        },
     };
+    return office;
 }

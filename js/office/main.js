@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { buildOffice } from './scene.js';
+import { SEASONS, TIMES, seasonForDate, timeForHour } from './outside.js';
 import { loadRepos, renderLaptop, renderResume, renderBook, renderContact } from './panels.js';
 
 const canvas = document.getElementById('office');
@@ -17,11 +18,33 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
+renderer.localClippingEnabled = true; // keeps snow/leaves inside the window glass
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, 1, 0.02, 40);
+const camera = new THREE.PerspectiveCamera(62, 1, 0.02, 40);
 const office = buildOffice(scene);
-document.getElementById('time-of-day').textContent = office.sky.label;
+
+// ---------- Season / time of day ----------
+// 'auto' follows the visitor's date and clock; the picker lets you preview the others.
+// Also settable by URL: office.html?season=winter&time=night
+
+const seasonSelect = document.getElementById('season');
+const timeSelect = document.getElementById('time');
+const params = new URLSearchParams(location.search);
+for (const [select, options, key] of [[seasonSelect, SEASONS, 'season'], [timeSelect, TIMES, 'time']]) {
+    select.innerHTML = ['auto', ...options].map(o => `<option value="${o}">${o}</option>`).join('');
+    if (options.includes(params.get(key))) select.value = params.get(key);
+}
+
+function applyConditions() {
+    const season = seasonSelect.value === 'auto' ? seasonForDate() : seasonSelect.value;
+    const time = timeSelect.value === 'auto' ? timeForHour(new Date().getHours()) : timeSelect.value;
+    office.setConditions(season, time);
+    document.getElementById('time-of-day').textContent = `${season} ${time}`;
+}
+seasonSelect.addEventListener('change', applyConditions);
+timeSelect.addEventListener('change', applyConditions);
+applyConditions();
 
 // ---------- Hotspots ----------
 
@@ -36,23 +59,20 @@ for (const [id, h] of Object.entries(HOTSPOTS)) h.object.traverse(o => { o.userD
 
 // Camera framings: [position, target]. Close-ups end where the DOM panel takes over.
 const VIEWS = {
-    overview: [new THREE.Vector3(1.85, 1.7, 1.25), new THREE.Vector3(-0.45, 0.95, -1.95)],
-    overviewPortrait: [new THREE.Vector3(0.6, 1.6, 1.3), new THREE.Vector3(-0.3, 1.0, -2.0)],
-    laptop: [new THREE.Vector3(-0.13, 1.1, -1.42), new THREE.Vector3(-0.22, 0.86, -2.16)],
-    paper: [new THREE.Vector3(0.42, 1.2, -1.66), new THREE.Vector3(0.42, 0.76, -1.86)],
-    shelf: [new THREE.Vector3(-1.6, 1.2, -0.45), new THREE.Vector3(-1.95, 1.08, -2.3)],
-    cork: [new THREE.Vector3(1.25, 1.5, -1.2), new THREE.Vector3(1.45, 1.52, -2.48)],
+    // seated at the desk, eye height ~1.2m
+    overview: [new THREE.Vector3(0, 1.25, 0.25), new THREE.Vector3(0, 1.12, -2.5)],
+    overviewPortrait: [new THREE.Vector3(0, 1.3, 0.35), new THREE.Vector3(0, 1.12, -2.5)],
+    laptop: [new THREE.Vector3(-0.12, 1.13, -0.92), new THREE.Vector3(-0.12, 0.92, -1.72)],
+    paper: [new THREE.Vector3(0.36, 1.16, -0.95), new THREE.Vector3(0.36, 0.76, -1.13)],
+    shelf: [new THREE.Vector3(-1.62, 1.22, -0.3), new THREE.Vector3(-1.68, 1.12, -2.3)],
+    cork: [new THREE.Vector3(1.6, 1.5, -1.15), new THREE.Vector3(1.72, 1.5, -2.48)],
 };
 
-// On narrow (portrait) screens pull the camera back along its view line so things fit.
+// Portrait screens use a dedicated seated framing (and a wider lens, see resize()).
 function framed(name) {
     const aspect = innerWidth / innerHeight;
     const [pos, target] = VIEWS[name === 'overview' && aspect < 0.9 ? 'overviewPortrait' : name];
-    const p = pos.clone();
-    if (aspect < 1.3 && (name === 'overview' || name === 'shelf')) {
-        p.sub(target).multiplyScalar(Math.pow(1.3 / aspect, 0.85)).add(target);
-    }
-    return [p, target.clone()];
+    return [pos.clone(), target.clone()];
 }
 
 // ---------- Camera tweening ----------
@@ -259,6 +279,8 @@ addEventListener('keydown', (ev) => {
 function resize() {
     renderer.setSize(innerWidth, innerHeight, false);
     camera.aspect = innerWidth / innerHeight;
+    // portrait screens get a wider lens so the wall still fits
+    camera.fov = camera.aspect < 1 ? Math.min(85, 62 / Math.sqrt(camera.aspect)) : 62;
     camera.updateProjectionMatrix();
     if (!tween) {
         const [p, t] = framed(mode === 'overview' || !VIEWS[mode] ? 'overview' : mode);
@@ -268,12 +290,12 @@ function resize() {
 }
 addEventListener('resize', resize);
 
-// intro: drift in from the doorway
+// intro: walk up behind the chair and take a seat
 const [startP, startT] = framed('overview');
-camPos.copy(startP).add(new THREE.Vector3(1.4, 0.5, 2.2));
+const standing = new THREE.Vector3(0.35, 0.5, 1.6);
 camTarget.copy(startT);
 resize();
-camPos.copy(startP).add(new THREE.Vector3(1.4, 0.5, 2.2));
+camPos.copy(startP).add(standing);
 flyTo('overview', 2.2).then(async () => {
     const [view, book] = location.hash.slice(1).split('/');
     if (!HASH_TO_VIEW[view]) return;
@@ -283,6 +305,7 @@ flyTo('overview', 2.2).then(async () => {
 });
 
 const clock = new THREE.Clock();
+const lookAt = new THREE.Vector3();
 
 renderer.setAnimationLoop(() => {
     const t = clock.getElapsedTime();
@@ -299,13 +322,14 @@ renderer.setAnimationLoop(() => {
         }
     }
 
-    // gentle parallax while looking around the room
+    // while seated, the pointer turns your head a little
     camera.position.copy(camPos);
+    lookAt.copy(camTarget);
     if (mode === 'overview' && !tween && !reduceMotion) {
-        camera.position.x += parallax.x * 0.12;
-        camera.position.y += -parallax.y * 0.06;
+        lookAt.x += parallax.x * 0.45;
+        lookAt.y -= parallax.y * 0.25;
     }
-    camera.lookAt(camTarget);
+    camera.lookAt(lookAt);
 
     for (const [mesh, a] of bookAnim) {
         mesh.position.lerp(a.to, 0.15);
@@ -321,6 +345,7 @@ renderer.setAnimationLoop(() => {
     office.laptop.update(t);
     office.mug.update(t);
     office.plant.update(t);
+    office.outside.update(t);
     renderer.render(scene, camera);
 });
 
